@@ -21,7 +21,8 @@ static void blink_pin(gpio_num_t pin)
     {
         led_state = !led_state;
         gpio_set_level(pin, led_state);
-
+        
+        // Delay
         vTaskDelay(blink_delay_ms/portTICK_PERIOD_MS);
     }
 }
