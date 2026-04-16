@@ -1,7 +1,7 @@
 #include "solaris_mode.h"
 
-// global variable to hold current mode. Defualt is set to stationary
-static solaris_mode_t g_mode = SOLARIS_MODE_STATIONARY;
+// global variable to hold current mode. Defualt is set to automatic
+static solaris_mode_t g_mode = SOLARIS_MODE_AUTOMATIC;
 
 // get 8 int response from BLE and set the current mode for g_mode
 bool solaris_mode_set_from_u8(uint8_t raw_mode)

@@ -38,13 +38,13 @@ span four overlapping demo windows at increasing density toward the present:
 #define MOCK_MAX_RECORDS 300
 
 /* Solar power curve: peaks at solar noon (W), negative at night */
-static int32_t solar_power_at(uint32_t ts)
+static int8_t solar_power_at(uint32_t ts)
 {
     /* seconds into the UTC day → normalised 0..1 */
     float day_frac = (float)(ts % 86400) / 86400.0f;
     /* sine peaking at midday (0.5), zero at dawn/dusk, negative at night */
     float power = sinf((day_frac - 0.25f) * 2.0f * (float)M_PI);
-    return (int32_t)(power * 600.0f); /* ±600 W range */
+    return (int8_t)(power * 100.0f); /* ±100 W range */
 }
 
 void solaris_mock_data_seed(void)
@@ -62,8 +62,6 @@ void solaris_mock_data_seed(void)
         { now - WINDOW_HOUR,  now,               INTERVAL_HOUR  },
     };
 
-    uint32_t dist_m = 0;
-
     for (int w = 0; w < 4; w++)
     {
         for (uint32_t ts = windows[w].start;
@@ -71,15 +69,18 @@ void solaris_mock_data_seed(void)
              ts += windows[w].interval)
         {
             /* Battery drains during use and charges when solar is positive */
-            int32_t power = solar_power_at(ts);
+            int8_t power = solar_power_at(ts);
             /* Clamp battery 20–95 % with a slow drift tied to record index */
             uint8_t batt = (uint8_t)(57 + 38 * sinf((float)count * 0.07f));
+            /* Distance moved in the last minute: 0–30 m, modulated by variation */
+            uint8_t dist = (uint8_t)(15 + 14 * sinf((float)count * 0.13f));
+            /* CPU temp: 45–75 °C, rises with solar load and record density */
+            uint8_t cpu_temp = (uint8_t)(60 + 15 * sinf((float)count * 0.11f));
 
-            dist_m += (uint32_t)(windows[w].interval / 4); /* ~1 m/s average */
-
-            records[count].timestamp       = ts;
-            records[count].battery_percent = batt;
-            records[count].distance_m      = dist_m;
+            records[count].timestamp        = ts;
+            records[count].cpu_temp         = cpu_temp;
+            records[count].battery_percent  = batt;
+            records[count].distance_m       = dist;
             records[count].net_power_gain_w = power;
             count++;
         }

@@ -3,11 +3,12 @@
  *   [0]      page_index    (uint8_t)
  *   [1]      total_pages   (uint8_t)
  *   [2]      record_count  (uint8_t)  records in this page
- *   [3..]    records       (13 bytes each):
+ *   [3..]    records       (9 bytes each):
  *              [0..3]  timestamp         (uint32_t)
- *              [4]     battery_percent   (uint8_t)
- *              [5..8]  distance_m        (uint32_t)
- *              [9..12] net_power_gain_w  (int32_t)
+ *              [4]     cpu_temp          (uint8_t)
+ *              [5]     battery_percent   (uint8_t)
+ *              [6]     distance_m        (uint8_t)
+ *              [7]     net_power_gain_w  (int8_t)
  *
  * Control characteristic write commands (1 byte):
  *   0x01 = REQUEST_PAGE  — start transfer or request first page
@@ -47,8 +48,8 @@
 #define PAGE_MAX_RETRIES 3
 
 /* ── Telemetry page payload ────────────────────────────────────────────── */
-#define TELEMETRY_RECORD_SIZE 13 /* bytes per encoded record */
-#define TELEMETRY_PAGE_HEADER 3  /* page_index + total_pages + record_count */
+#define TELEMETRY_RECORD_SIZE 8 /* bytes per encoded record */
+#define TELEMETRY_PAGE_HEADER 3 /* page_index + total_pages + record_count */
 #define TELEMETRY_PAGE_BUF_LEN \
     (TELEMETRY_PAGE_HEADER + SOLARIS_TELEMETRY_RECORDS_PER_PAGE * TELEMETRY_RECORD_SIZE)
 
@@ -166,11 +167,6 @@ static inline void put_u32_le(uint8_t *dst, uint32_t v)
     dst[3] = (uint8_t)(v >> 24);
 }
 
-// if given value is not unsigned.
-static inline void put_i32_le(uint8_t *dst, int32_t v)
-{
-    put_u32_le(dst, (uint32_t)v);
-}
 
 // get 32 bit value
 static inline uint32_t get_u32_le(const uint8_t *p)
@@ -214,9 +210,10 @@ static void send_current_page(void)
      *   buf[2] = record count
      *   buf[3..N] = records, each TELEMETRY_RECORD_SIZE bytes:
      *     +0..3  timestamp        (uint32_t, little-endian)
-     *     +4     battery_percent  (uint8_t)
-     *     +5..8  distance_m       (uint32_t, little-endian)
-     *     +9..12 net_power_gain_w (int32_t,  little-endian)
+     *     +4     cpu_temp         (uint8_t)
+     *     +5     battery_percent  (uint8_t)
+     *     +6     distance_m       (uint8_t)
+     *     +7     net_power_gain_w (int8_t)
      */
     uint8_t buf[TELEMETRY_PAGE_BUF_LEN];
     buf[0] = (uint8_t)current_page;
@@ -228,9 +225,10 @@ static void send_current_page(void)
     for (int i = 0; i < count; i++)
     {
         put_u32_le(p, records[i].timestamp);
-        p[4] = records[i].battery_percent;
-        put_u32_le(p + 5, records[i].distance_m);
-        put_i32_le(p + 9, records[i].net_power_gain_w);
+        p[4] = records[i].cpu_temp;
+        p[5] = records[i].battery_percent;
+        p[6] = records[i].distance_m;
+        p[7] = (uint8_t)records[i].net_power_gain_w;
         p += TELEMETRY_RECORD_SIZE; /* advance to next record slot */
     }
 
@@ -389,7 +387,19 @@ static int handle_weather_write(struct ble_gatt_access_ctxt *ctxt)
         return BLE_ATT_ERR_UNLIKELY;
     }
 
-    ESP_LOGI(TAG, "weather forecast received");
+    solaris_weather_t g_weather;
+    solaris_weather_get(&g_weather);
+    ESP_LOGI(TAG, "weather forecast received — sunrise=%u sunset=%u",
+             g_weather.sunrise, g_weather.sunset);
+    for (int i = 0; i < SOLARIS_WEATHER_FORECAST_HOURS; i++)
+    {
+        ESP_LOGI(TAG, "  [%02d] t=%u cloud=%u%% precip=%u%%",
+                 i,
+                 g_weather.forecast[i].time,
+                 g_weather.forecast[i].cloud_cover_pct,
+                 g_weather.forecast[i].precip_probability_pct);
+    }
+
     return 0;
 }
 
@@ -400,6 +410,11 @@ static int handle_manual_ctrl_write(struct ble_gatt_access_ctxt *ctxt)
 
     solaris_manual_ctrl_set((int8_t)ctxt->om->om_data[0],
                             (int8_t)ctxt->om->om_data[1]);
+    int8_t throttle;
+    int8_t steering;
+    solaris_manual_ctrl_get(&throttle, &steering);
+    ESP_LOGI(TAG, "throttle: %d\tsteering:%d", throttle, steering);
+
     return 0;
 }
 

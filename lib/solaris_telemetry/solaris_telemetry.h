@@ -10,14 +10,15 @@
 #include <stdint.h>
 
 #define SOLARIS_TELEMETRY_LOG_CAPACITY 1440
-#define SOLARIS_TELEMETRY_RECORDS_PER_PAGE 15
+#define SOLARIS_TELEMETRY_RECORDS_PER_PAGE 30
 
 typedef struct
 {
     uint32_t timestamp; /* Unix timestamp */
+    uint8_t cpu_temp;   /* CPU temperature in °C */
     uint8_t battery_percent;
-    uint32_t distance_m;
-    int32_t net_power_gain_w;
+    uint8_t distance_m;
+    int8_t net_power_gain_w;
 } solaris_telemetry_t;
 
 /* Load telemetry records from NVS into memory */
