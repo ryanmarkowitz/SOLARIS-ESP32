@@ -3,6 +3,7 @@
 #include "gatt_svc.h"
 #include "solaris_mock_data.h"
 #include "nimble_init.h"
+#include "esp_pm.h"
 #define TAG "NIMBLE_INIT"
 
 /* ble_store_config_init has no public header in ESP-IDF — forward declare it */
@@ -76,7 +77,19 @@ void nimble_init(void)
     // TODO: remove mock data seeding before production
     solaris_mock_data_seed();
 
-    /* NimBLE stack initialization */
+/* NimBLE stack initialization */
+#if CONFIG_PM_ENABLE
+    esp_pm_config_t pm_config = {
+        .max_freq_mhz = 240,
+        .min_freq_mhz = 40,
+#if CONFIG_FREERTOS_USE_TICKLESS_IDLE
+        .light_sleep_enable = true
+#endif
+    };
+    ESP_ERROR_CHECK(esp_pm_configure(&pm_config));
+    ESP_LOGI(TAG, "automatic light sleep configured");
+#endif
+
     ret = nimble_port_init();
     if (ret != ESP_OK)
     {
