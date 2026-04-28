@@ -1,0 +1,2 @@
+#define LOW_LIMIT -32000;
+#define HIGH_LIMIT 32000;
