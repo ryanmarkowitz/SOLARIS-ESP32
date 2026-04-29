@@ -9,8 +9,8 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 
-#define PWM_PIN 3
-#define DIR_PIN 14
+#define PWM_PIN 10
+#define DIR_PIN 11
 #define PWM_PERIOD_TICKS 50
 
 #define TAG "MOTOR_DRIVER_SERVICE"

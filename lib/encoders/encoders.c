@@ -15,8 +15,8 @@
 #define HIGH_LIMIT 32767
 #define FORWARD_TARGET 439   // maps to 30 degrees
 #define BACKWARD_TARGET -449 // maps to -30 degrees
-#define CHAN_GPIO_A 14
-#define DIRECTION_PIN 12
+#define CHAN_GPIO_A 5
+#define DIRECTION_PIN 11
 
 pcnt_unit_handle_t pcnt_unit1 = NULL;
 pcnt_channel_handle_t pcnt_chan1 = NULL;
