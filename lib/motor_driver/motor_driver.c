@@ -1,6 +1,7 @@
 #include "motor_driver.h"
 #include "esp_log.h"
 #include <stdint.h>
+#include <encoders.h>
 #include "driver/mcpwm_timer.h"
 #include "driver/mcpwm_prelude.h"
 #include "driver/mcpwm_oper.h"
@@ -81,6 +82,8 @@ void motor_init()
 void stop_motor()
 {
     mcpwm_comparator_set_compare_value(motor_comparator, 0);
+    vTaskDelay(pdMS_TO_TICKS(100)); // small delay before saving position to flash in case motor kept moving forward for some time
+    save_position_to_flash();
 }
 
 // makes motor go forward at 25% duty cycle
