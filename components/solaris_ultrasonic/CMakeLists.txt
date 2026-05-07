@@ -1,0 +1,12 @@
+idf_component_register(
+    SRCS
+        "solaris_ultrasonic.c"
+    INCLUDE_DIRS
+        "include"
+    REQUIRES
+        esp_adc
+        driver
+        esp_rom
+        freertos
+        log
+)
