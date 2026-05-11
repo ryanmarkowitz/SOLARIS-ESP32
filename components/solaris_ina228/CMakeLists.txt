@@ -1,0 +1,10 @@
+idf_component_register(
+    SRCS
+        "solaris_ina228.c"
+    INCLUDE_DIRS
+        "include"
+    REQUIRES
+        driver
+        freertos
+        log
+)
