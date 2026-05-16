@@ -8,5 +8,6 @@
 /* Function declarations */
 void encoder_init();
 esp_err_t save_position_to_flash();
+int get_pulse_count();
 
 #endif
