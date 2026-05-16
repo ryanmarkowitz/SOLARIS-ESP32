@@ -125,8 +125,14 @@ void encoder_init()
     saved_position = load_position_from_flash();
 
     // Set watchpoint endpoints to relative position rather than the counter's absolute position
+    // TODO UNCOMMENT AFTER DEBUG
+    /*
     int forward_max_position = FORWARD_TARGET - saved_position;
     int backward_max_position = BACKWARD_TARGET - saved_position;
+    */
+
+    int forward_max_position = FORWARD_TARGET;
+    int backward_max_position = BACKWARD_TARGET;
 
     ESP_ERROR_CHECK(pcnt_unit_add_watch_point(pcnt_unit1, forward_max_position));
     ESP_ERROR_CHECK(pcnt_unit_add_watch_point(pcnt_unit1, backward_max_position));
