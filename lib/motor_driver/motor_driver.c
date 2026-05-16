@@ -129,17 +129,22 @@ void motor_go_backward()
 void test_motor()
 {
     while (1)
-    {
-        get_pulse_count();
+    {   
+        int pulse_count;
+        pulse_count = get_pulse_count();
+        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_forward();
         vTaskDelay(pdMS_TO_TICKS(7500));
-        get_pulse_count();
+        pulse_count = get_pulse_count();
+        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_forward();
         vTaskDelay(pdMS_TO_TICKS(7500));
-        get_pulse_count();
+        pulse_count = get_pulse_count();
+        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_backward();
         vTaskDelay(pdMS_TO_TICKS(7500));
-        get_pulse_count();
+        pulse_count = get_pulse_count();
+        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_backward();
         vTaskDelay(pdMS_TO_TICKS(7500));
     }
