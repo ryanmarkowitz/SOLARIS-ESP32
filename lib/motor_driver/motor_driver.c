@@ -12,6 +12,7 @@
 
 #define PWM_PIN 10
 #define DIR_PIN 11
+#define INV_DIR_PIN 12 // only used if inverter is not used in circuit (as is the case for prototyping).
 #define PWM_PERIOD_TICKS 50
 
 #define TAG "MOTOR_DRIVER_SERVICE"
@@ -69,6 +70,7 @@ void motor_init()
 
     // Direction GPIO
     gpio_set_direction(DIR_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_direction(INV_DIR_PIN, GPIO_MODE_OUTPUT);
 
     // Set Duty cycle to 0% at init
     mcpwm_comparator_set_compare_value(motor_comparator, 0);
@@ -94,6 +96,8 @@ void motor_go_forward()
         s_state = PANEL_OK;
         // set the motors direction to forward
         gpio_set_level(DIR_PIN, 1);
+        gpio_set_level(INV_DIR_PIN, 0);
+        
         mcpwm_comparator_set_compare_value(motor_comparator, 13);
         ESP_LOGI(TAG, "Moving the motors forward");
     }
@@ -111,6 +115,8 @@ void motor_go_backward()
         s_state = PANEL_OK;
         // set the motors direction to reverse
         gpio_set_level(DIR_PIN, 0);
+        gpio_set_level(INV_DIR_PIN, 1);
+
         mcpwm_comparator_set_compare_value(motor_comparator, 13);
         ESP_LOGI(TAG, "Moving the motors backward");
     }
