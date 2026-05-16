@@ -24,6 +24,12 @@ static QueueHandle_t encoder_queue = NULL;
 
 int saved_position = 0;
 
+int get_pulse_count(){
+    int count = 0;
+    pcnt_unit_get_count(pcnt_unit1, &count);
+    return count;
+}
+
 // When watchpoint is reached, send high priority task through queue sending the count in PCNT
 static bool on_encoder_limit_reached(pcnt_unit_handle_t unit, const pcnt_watch_event_data_t *edata, void *user_ctx)
 {

@@ -130,12 +130,16 @@ void test_motor()
 {
     while (1)
     {
+        get_pulse_count();
         motor_go_forward();
         vTaskDelay(pdMS_TO_TICKS(7500));
+        get_pulse_count();
         motor_go_forward();
         vTaskDelay(pdMS_TO_TICKS(7500));
+        get_pulse_count();
         motor_go_backward();
         vTaskDelay(pdMS_TO_TICKS(7500));
+        get_pulse_count();
         motor_go_backward();
         vTaskDelay(pdMS_TO_TICKS(7500));
     }
