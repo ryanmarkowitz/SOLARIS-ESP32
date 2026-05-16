@@ -69,7 +69,7 @@ void motor_init()
                                                                                motor_comparator, MCPWM_GEN_ACTION_LOW));
 
     // Direction GPIO
-    gpio_set_direction(DIR_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_direction(DIR_PIN, GPIO_MODE_INPUT_OUTPUT);
     gpio_set_direction(INV_DIR_PIN, GPIO_MODE_OUTPUT);
 
     // Set Duty cycle to 0% at init
