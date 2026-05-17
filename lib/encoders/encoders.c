@@ -50,13 +50,13 @@ static void encoder_handler(void *param)
         if (xQueueReceive(encoder_queue, &watch_point_value, portMAX_DELAY))
         {
             ESP_LOGI(TAG, "Watchpoint reached: %d", watch_point_value);
-            if (watch_point_value >= FORWARD_TARGET)
+            if (watch_point_value >= FORWARD_TARGET && (gpio_get_level(DIRECTION_PIN) == 1))
             {
                 stop_motor();
                 panel_set_limit_state(PANEL_AT_UPPER_LIMIT);
                 ESP_LOGI(TAG, "Panel at upper limit");
             }
-            else if (watch_point_value <= BACKWARD_TARGET)
+            else if (watch_point_value <= BACKWARD_TARGET && (gpio_get_level(DIRECTION_PIN) == 0))
             {
                 stop_motor();
                 panel_set_limit_state(PANEL_AT_LOWER_LIMIT);
