@@ -5,6 +5,7 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 #include "nvs.h"
+#include "driver/gpio.h"
 
 #define NVS_NAMESPACE "panel"
 #define NVS_KEY_PAN_POSITION "pan_position"
@@ -13,8 +14,8 @@
 
 #define LOW_LIMIT -32768
 #define HIGH_LIMIT 32767
-#define FORWARD_TARGET 439   // maps to 30 degrees
-#define BACKWARD_TARGET -449 // maps to -30 degrees
+#define FORWARD_TARGET 70   // maps to 30 degrees
+#define BACKWARD_TARGET -69 // maps to -30 degrees
 #define CHAN_GPIO_A 5
 #define DIRECTION_PIN 11
 
@@ -24,7 +25,8 @@ static QueueHandle_t encoder_queue = NULL;
 
 int saved_position = 0;
 
-int get_pulse_count(){
+int get_pulse_count()
+{
     int count = 0;
     pcnt_unit_get_count(pcnt_unit1, &count);
     return count;
