@@ -6,6 +6,7 @@
 #include "driver/gpio.h"
 #include "nvs_flash.h"
 
+// Commit before merging
 void app_main(void)
 {
     // initialize NVS
