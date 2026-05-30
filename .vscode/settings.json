@@ -1,10 +1,14 @@
 {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> origin/solaris-imu
   "C_Cpp.intelliSenseEngine": "default",
   "idf.extensionActivationMode": "always",
+=======
+  "C_Cpp.intelliSenseEngine": "default",
+>>>>>>> origin/solaris-ultrasonic
   "idf.openOcdConfigs": [
     "board/esp32-wrover-kit-3.3v.cfg"
   ],
@@ -13,6 +17,7 @@
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
   },
+<<<<<<< HEAD
 <<<<<<< HEAD
   "clangd.path": "/home/ryan/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
   "clangd.arguments": [
@@ -27,12 +32,21 @@
 }
 >>>>>>> ble
 =======
+=======
+>>>>>>> origin/solaris-ultrasonic
   "clangd.path": "C:\\Espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
   "clangd.arguments": [
     "--background-index",
     "--query-driver=**",
+<<<<<<< HEAD
     "--compile-commands-dir=c:\\Users\\forti\\solaris_imu\\build"
   ],
   "idf.flashType": "UART"
 }
 >>>>>>> origin/solaris-imu
+=======
+    "--compile-commands-dir=c:\\Users\\forti\\ultrasonic-demo\\build"
+  ],
+  "idf.flashType": "UART"
+}
+>>>>>>> origin/solaris-ultrasonic
