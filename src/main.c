@@ -7,8 +7,12 @@
 #include "driver/gpio.h"
 #include "nvs_flash.h"
 #include <solaris_ina228.h>
+#include <solaris_icm20948.h>
+#include "esp_log.h"
 
 #define LOOP_DELAY_MS 500
+
+#define TAG "Main"
 
 void app_main(void)
 {
@@ -28,6 +32,23 @@ void app_main(void)
     encoder_init();
     motor_init();
     test_motor();
+
+    // 1. Load the default configuration (SCL:40, SDA:41, INT:39)
+    solaris_icm20948_config_t imu_cfg = SOLARIS_ICM20948_CONFIG_DEFAULT();
+    solaris_icm20948_handle_t imu_handle = NULL;
+
+    // 2. Initialize the sensor (Handles I2C setup, Wake, and AK09916 Bypass)
+    err = solaris_icm20948_init(&imu_cfg, &imu_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize IMU. Halting.");
+        while (1)
+        {
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+    }
+
+    solaris_icm20948_result_t imu_data;
 
     // 1. Build config from defaults, override what you need
     solaris_ina228_config_t cfg = SOLARIS_INA228_CONFIG_DEFAULT();
@@ -53,6 +74,21 @@ void app_main(void)
         solaris_ina228_print_teleplot(power_monitor, &result);
 
         vTaskDelay(pdMS_TO_TICKS(LOOP_DELAY_MS));
+
+        // Ignore the INT wire and force an I2C read
+        esp_err_t status = solaris_icm20948_read(imu_handle, &imu_data);
+
+        if (status == ESP_OK)
+        {
+            solaris_icm20948_log(&imu_data);
+        }
+        else
+        {
+            ESP_LOGW(TAG, "I2C read failed during polling");
+        }
+
+        // Wait 100ms before asking again (10Hz refresh rate)
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 
     // Cleanup (never reached in this example)

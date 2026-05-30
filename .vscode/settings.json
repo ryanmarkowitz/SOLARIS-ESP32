@@ -1,5 +1,8 @@
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/solaris-imu
   "C_Cpp.intelliSenseEngine": "default",
   "idf.extensionActivationMode": "always",
   "idf.openOcdConfigs": [
@@ -10,6 +13,7 @@
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
   },
+<<<<<<< HEAD
   "clangd.path": "/home/ryan/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
   "clangd.arguments": [
     "--background-index",
@@ -22,3 +26,13 @@
     "idf.currentSetup": "/home/ryan/.espressif/v5.5.2/esp-idf"
 }
 >>>>>>> ble
+=======
+  "clangd.path": "C:\\Espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=**",
+    "--compile-commands-dir=c:\\Users\\forti\\solaris_imu\\build"
+  ],
+  "idf.flashType": "UART"
+}
+>>>>>>> origin/solaris-imu
