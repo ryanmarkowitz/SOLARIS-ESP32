@@ -15,6 +15,7 @@ void app_main(void)
     // Initialize nimBLE
     vTaskDelay(pdMS_TO_TICKS(3000)); // 3 second delay
     nimble_init();
+
     // initialize NVS
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NEW_VERSION_FOUND)
