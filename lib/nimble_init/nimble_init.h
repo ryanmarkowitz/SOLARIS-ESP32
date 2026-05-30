@@ -1,0 +1,1 @@
+void nimble_init(void);
