@@ -1,0 +1,1 @@
+Fully working current sensor library with integrated pin assignments, example of how to port into main project is shown in main.c
