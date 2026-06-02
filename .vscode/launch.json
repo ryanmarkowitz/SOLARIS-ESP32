@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 // AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
 //
 // PlatformIO Debugging Solution
@@ -10,11 +8,6 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "type": "gdbtarget",
-            "request": "attach",
-            "name": "Eclipse CDT GDB Adapter"
-        },
         {
             "type": "platformio-debug",
             "request": "launch",
@@ -49,21 +42,3 @@
         }
     ]
 }
-=======
-=======
->>>>>>> origin/solaris-ultrasonic
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "gdbtarget",
-      "request": "attach",
-      "name": "Eclipse CDT GDB Adapter"
-    }
-  ]
-<<<<<<< HEAD
-}
->>>>>>> origin/solaris-imu
-=======
-}
->>>>>>> origin/solaris-ultrasonic

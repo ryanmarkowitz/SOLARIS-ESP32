@@ -36,16 +36,16 @@ static mcpwm_timer_handle_t shared_timer = NULL;
 static mcpwm_oper_handle_t shared_operators[3] = {NULL, NULL, NULL};
 
 // Track if panning of solar panel is at its maximum degree
-static volatile panel_limit_state_t s_state = PANEL_OK;
+static volatile panel_limit_state_t s_state[2] = {PANEL_OK, PANEL_OK};
 
-panel_limit_state_t panel_get_limit_state(void)
+panel_limit_state_t panel_get_limit_state(uint8_t panel_id)
 {
-    return s_state;
+    return s_state[panel_id];
 }
 
-void panel_set_limit_state(panel_limit_state_t state)
+void panel_set_limit_state(uint8_t panel_id, panel_limit_state_t state)
 {
-    s_state = state;
+    s_state[panel_id] = state;
 }
 
 void motor_init(void)
@@ -102,50 +102,53 @@ void motor_init(void)
 }
 
 // Set duty cycle to 0 for the motor to stop it
-void stop_motor(int motor_id)
+void stop_motor(uint8_t motor_id)
 {
     mcpwm_comparator_set_compare_value(motors[motor_id].comparator, 0);
     vTaskDelay(pdMS_TO_TICKS(100)); // small delay before saving position to flash in case motor kept moving forward for some time
-    save_position_to_flash();
+    if (motor_id <= 1)
+        save_position_to_flash(motor_id);
 }
 
-// makes motor go forward at 25% duty cycle
-void motor_go_forward(int motor_id)
+// makes motor go forward at duty_cycle%
+void motor_go_forward(uint8_t motor_id, float duty_cycle)
 {
     const motor_pins_t *pins = &motors[motor_id].pins;
 
-    if (s_state != PANEL_AT_UPPER_LIMIT)
+    if (motor_id > 1 || s_state[motor_id] != PANEL_AT_UPPER_LIMIT)
     {
-        s_state = PANEL_OK;
+        if (motor_id <= 1)
+            s_state[motor_id] = PANEL_OK;
         // set the motors direction to forward
         gpio_set_level(pins->dir_gpio, 1);
 
-        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, 5);
-        ESP_LOGI(TAG, "Moving the motors forward");
+        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
+        ESP_LOGI(TAG, "Moving the motor #%d forward", motor_id);
     }
     else
     {
-        ESP_LOGI(TAG, "Trying to move panel forward, but upper limit is reached");
+        ESP_LOGI(TAG, "Trying to move panel forward, but upper limit is reached for motor #%d", motor_id);
     }
 }
 
-// makes motor go backward at 25% duty cycle
-void motor_go_backward(int motor_id)
+// makes motor go backward at duty_cycle%
+void motor_go_backward(uint8_t motor_id, float duty_cycle)
 {
     const motor_pins_t *pins = &motors[motor_id].pins;
 
-    if (s_state != PANEL_AT_LOWER_LIMIT)
+    if (motor_id > 1 || s_state[motor_id] != PANEL_AT_LOWER_LIMIT)
     {
-        s_state = PANEL_OK;
+        if (motor_id <= 1)
+            s_state[motor_id] = PANEL_OK;
         // set the motors direction to reverse
         gpio_set_level(pins->dir_gpio, 0);
 
-        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, 5);
-        ESP_LOGI(TAG, "Moving the motors backward");
+        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
+        ESP_LOGI(TAG, "Moving the motor #%d backward", motor_id);
     }
     else
     {
-        ESP_LOGI(TAG, "Trying to move panel backward but lower limit is reached");
+        ESP_LOGI(TAG, "Trying to move panel backward but lower limit is reached for motor #%d", motor_id);
     }
 }
 
@@ -153,22 +156,23 @@ void test_motor()
 {
     while (1)
     {
-        int pulse_count;
-        pulse_count = get_pulse_count();
-        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        motor_go_forward(0);
-        vTaskDelay(pdMS_TO_TICKS(10000));
-        pulse_count = get_pulse_count();
-        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        motor_go_forward(0);
-        vTaskDelay(pdMS_TO_TICKS(10000));
-        pulse_count = get_pulse_count();
-        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        motor_go_backward(0);
-        vTaskDelay(pdMS_TO_TICKS(10000));
-        pulse_count = get_pulse_count();
-        ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        motor_go_backward(0);
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        // Create your own test code if needed
+        // int pulse_count;
+        // pulse_count = get_pulse_count();
+        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
+        // motor_go_forward(0);
+        // vTaskDelay(pdMS_TO_TICKS(10000));
+        // pulse_count = get_pulse_count();
+        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
+        // motor_go_forward(0);
+        // vTaskDelay(pdMS_TO_TICKS(10000));
+        // pulse_count = get_pulse_count();
+        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
+        // motor_go_backward(0);
+        // vTaskDelay(pdMS_TO_TICKS(10000));
+        // pulse_count = get_pulse_count();
+        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
+        // motor_go_backward(0);
+        // vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }

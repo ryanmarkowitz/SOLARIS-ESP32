@@ -32,7 +32,6 @@ void app_main(void)
 
     encoder_init();
     motor_init();
-    test_motor();
 
     // 1. Load the default configuration (SCL:40, SDA:41, INT:39)
     solaris_icm20948_config_t imu_cfg = SOLARIS_ICM20948_CONFIG_DEFAULT();

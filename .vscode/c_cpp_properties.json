@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 //
 // !!! WARNING !!! AUTO-GENERATED FILE!
 // PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
@@ -11,7 +9,9 @@
             "name": "PlatformIO",
             "includePath": [
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/src",
+                "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ultrasonic",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ina228",
+                "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_icm20948",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/nimble_init",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_mock_data",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/gap",
@@ -236,7 +236,9 @@
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/src",
+                    "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ultrasonic",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ina228",
+                    "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_icm20948",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/nimble_init",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_mock_data",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/gap",
@@ -484,35 +486,4 @@
         }
     ],
     "version": 4
-=======
-=======
->>>>>>> origin/solaris-ultrasonic
-{
-  "configurations": [
-    {
-      "name": "ESP-IDF",
-<<<<<<< HEAD
-      "compilerPath": "C:\\Espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20251107\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
-      "compileCommands": "${config:idf.buildPath}/compile_commands.json",
-      "intelliSenseMode": "gcc-x86",
-=======
-      "compilerPath": "C:\\Espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20251107\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
-      "compileCommands": "${config:idf.buildPath}/compile_commands.json",
->>>>>>> origin/solaris-ultrasonic
-      "includePath": [
-        "${workspaceFolder}/**"
-      ],
-      "browse": {
-        "path": [
-          "${workspaceFolder}"
-        ],
-        "limitSymbolsToIncludedHeaders": true
-      }
-    }
-  ],
-  "version": 4
-<<<<<<< HEAD
->>>>>>> origin/solaris-imu
-=======
->>>>>>> origin/solaris-ultrasonic
 }

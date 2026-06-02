@@ -4,7 +4,16 @@
 #include "driver/mcpwm_cmpr.h"
 
 #define NUM_MOTORS 6
+#define PANEL_PAN_ID 0
+#define PANEL_TILT_ID 1
+#define MOTOR_PAN_ID 0
+#define MOTOR_TILT_ID 1
+#define MOTOR_FL_ID 2
+#define MOTOR_FR_ID 3
+#define MOTOR_RL_ID 4
+#define MOTOR_RR_ID 5
 
+/* Structs and enums */
 typedef struct
 {
     uint8_t pwm_gpio;
@@ -28,12 +37,12 @@ typedef struct
 } motor_t;
 
 /* Function Declarations */
-panel_limit_state_t panel_get_limit_state(void);
-void panel_set_limit_state(panel_limit_state_t state);
-void stop_motor();
+panel_limit_state_t panel_get_limit_state(uint8_t panel_id);
+void panel_set_limit_state(uint8_t panel_id, panel_limit_state_t state);
+void stop_motor(uint8_t panel_id);
 void motor_init();
-void motor_go_forward();
-void motor_go_backward();
+void motor_go_forward(uint8_t panel_id, float duty_cycle);
+void motor_go_backward(uint8_t panel_id, float duty_cycle);
 void test_motor();
 
 #endif
