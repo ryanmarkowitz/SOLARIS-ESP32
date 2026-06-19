@@ -14,8 +14,8 @@
 
 #define LOW_LIMIT -32768
 #define HIGH_LIMIT 32767
-#define FORWARD_TARGET 70   // maps to 30 degrees
-#define BACKWARD_TARGET -69 // maps to -30 degrees
+#define FORWARD_TARGET 300   // maps to 30 degrees
+#define BACKWARD_TARGET -300 // maps to -30 degrees
 #define CHAN_GPIO_A 5
 #define DIRECTION_PIN 11
 
@@ -52,13 +52,13 @@ static void encoder_handler(void *param)
         if (xQueueReceive(encoder_queue, &watch_point_value, portMAX_DELAY))
         {
             ESP_LOGI(TAG, "Watchpoint reached: %d", watch_point_value);
-            if (watch_point_value >= FORWARD_TARGET && (gpio_get_level(DIRECTION_PIN) == 1))
+            if (watch_point_value >= FORWARD_TARGET && (gpio_get_level(DIRECTION_PIN) == 0))
             {
                 stop_motor();
                 panel_set_limit_state(PANEL_AT_UPPER_LIMIT);
                 ESP_LOGI(TAG, "Panel at upper limit");
             }
-            else if (watch_point_value <= BACKWARD_TARGET && (gpio_get_level(DIRECTION_PIN) == 0))
+            else if (watch_point_value <= BACKWARD_TARGET && (gpio_get_level(DIRECTION_PIN) == 1))
             {
                 stop_motor();
                 panel_set_limit_state(PANEL_AT_LOWER_LIMIT);

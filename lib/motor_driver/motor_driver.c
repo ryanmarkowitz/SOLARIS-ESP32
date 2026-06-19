@@ -98,7 +98,7 @@ void motor_go_forward()
         gpio_set_level(DIR_PIN, 1);
         gpio_set_level(INV_DIR_PIN, 0);
 
-        mcpwm_comparator_set_compare_value(motor_comparator, 5);
+        mcpwm_comparator_set_compare_value(motor_comparator, 10);
         ESP_LOGI(TAG, "Moving the motors forward");
     }
     else
@@ -117,7 +117,7 @@ void motor_go_backward()
         gpio_set_level(DIR_PIN, 0);
         gpio_set_level(INV_DIR_PIN, 1);
 
-        mcpwm_comparator_set_compare_value(motor_comparator, 5);
+        mcpwm_comparator_set_compare_value(motor_comparator, 10);
         ESP_LOGI(TAG, "Moving the motors backward");
     }
     else
@@ -134,18 +134,18 @@ void test_motor()
         pulse_count = get_pulse_count();
         ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_forward();
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
         pulse_count = get_pulse_count();
         ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_forward();
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
         pulse_count = get_pulse_count();
         ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_backward();
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
         pulse_count = get_pulse_count();
         ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
         motor_go_backward();
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
