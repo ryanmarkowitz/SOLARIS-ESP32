@@ -230,6 +230,7 @@
                 "/home/ryan/.platformio/packages/framework-espidf/components/usb/include",
                 "/home/ryan/.platformio/packages/framework-espidf/components/wifi_provisioning/include",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/include",
+                "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/driver",
                 ""
             ],
             "browse": {
@@ -457,6 +458,7 @@
                     "/home/ryan/.platformio/packages/framework-espidf/components/usb/include",
                     "/home/ryan/.platformio/packages/framework-espidf/components/wifi_provisioning/include",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/include",
+                    "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/driver",
                     ""
                 ]
             },

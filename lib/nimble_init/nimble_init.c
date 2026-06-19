@@ -4,6 +4,7 @@
 #include "solaris_mock_data.h"
 #include "nimble_init.h"
 #include "esp_pm.h"
+
 #define TAG "NIMBLE_INIT"
 
 /* ble_store_config_init has no public header in ESP-IDF — forward declare it */
@@ -57,26 +58,6 @@ void nimble_init(void)
     int rc = 0;
     esp_err_t ret;
 
-    /*
-     * NVS flash initialization
-     * Dependency of BLE stack to store configurations
-     */
-    ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
-        ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "failed to initialize nvs flash, error code: %d ", ret);
-        return;
-    }
-
-    // TODO: remove mock data seeding before production
-    solaris_mock_data_seed();
-
 /* NimBLE stack initialization */
 #if CONFIG_PM_ENABLE
     esp_pm_config_t pm_config = {
@@ -120,6 +101,6 @@ void nimble_init(void)
     nimble_host_config_init();
 
     /* Start NimBLE host task thread and return */
-    xTaskCreate(nimble_host_task, "NimBLE Host", 4 * 1024, NULL, 5, NULL);
+    xTaskCreatePinnedToCore(nimble_host_task, "NimBLE Host", 4 * 1024, NULL, 5, NULL, 0);
     return;
 }
