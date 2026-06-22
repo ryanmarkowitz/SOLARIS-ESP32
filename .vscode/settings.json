@@ -1,3 +1,9 @@
 {
-    "idf.currentSetup": "/home/ryan/.espressif/v5.5.2/esp-idf"
+  "idf.currentSetup": "/home/ryan/.espressif/v5.5.2/esp-idf",
+  "clangd.path": "/home/ryan/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=**",
+    "--compile-commands-dir=/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/build"
+  ]
 }

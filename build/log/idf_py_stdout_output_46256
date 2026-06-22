@@ -1,0 +1,2645 @@
+Command: /home/ryan/.espressif/python_env/idf5.5_py3.13_env/bin/python /home/ryan/.espressif/v5.5.2/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 /home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/build/solaris_currentsensor.elf /home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/build/bootloader/bootloader.elf -m '/home/ryan/.espressif/python_env/idf5.5_py3.13_env/bin/python' '/home/ryan/.espressif/v5.5.2/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+RAMESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40048839
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (28) boot: efuse block revision: v1.3[0m
+[0;32mI (32) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (43) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (63) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (76) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (95) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (98) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (138) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (164) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (165) cpu_start: Pro cpu start user code[0m
+[0;32mI (165) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (170) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (180) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (185) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (189) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (205) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (227) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (251) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (267) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (274) main_task: Started on CPU0[0m
+[0;32mI (284) main_task: Calling app_main()[0m
+[1;31mE (284) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (170) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (205) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA228: INA228 not found! Manufacturer ID: 0x0000[0m
+ESP_ERROR_CHECK failed: esp_err_t 0x105 (ESP_ERR_NOT_FOUND) at 0x420093b4
+file: "./main/main.c" line 20
+func: app_main
+expression: solaris_ina228_init(&cfg, &power_monitor)
+
+abort() was called at PC 0x4037a60b on core 0
+
+
+Backtrace: 0x4037a64d:0x3fc99580 0x4037a615:0x3fc995a0 0x403811d9:0x3fc995c0 0x4037a60b:0x3fc99630 0x420093b4:0x3fc99660 0x42015ee8:0x3fc996e0 0x4037b25d:0x3fc99710
+
+
+
+
+ELF file SHA256: da98f8270
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a79c
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x158c
+load:0x403c8700,len:0xd24
+load:0x403cb700,len:0x2f34
+entry 0x403c8924
+[0;32mI (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Jun 19 2026 17:00:15[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (25) boot: chip revision: v0.2[0m
+[0;32mI (27) boot: efuse block revision: v1.3[0m
+[0;32mI (31) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (35) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (39) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (42) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: Partition Table:[0m
+[0;32mI (50) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (69) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (75) boot: End of partition table[0m
+[0;32mI (79) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0b618h ( 46616) map[0m
+[0;32mI (94) esp_image: segment 1: paddr=0001b640 vaddr=3fc93a00 size=02b10h ( 11024) load[0m
+[0;32mI (97) esp_image: segment 2: paddr=0001e158 vaddr=40374000 size=01ec0h (  7872) load[0m
+[0;32mI (103) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=166ach ( 91820) map[0m
+[0;32mI (125) esp_image: segment 4: paddr=000366d4 vaddr=40375ec0 size=0da68h ( 55912) load[0m
+[0;32mI (137) esp_image: segment 5: paddr=00044144 vaddr=50000000 size=00020h (    32) load[0m
+[0;32mI (144) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (144) boot: Disabling RNG early entropy source...[0m
+[0;32mI (155) cpu_start: Multicore app[0m
+[0;32mI (163) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (164) cpu_start: Pro cpu start user code[0m
+[0;32mI (164) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (166) app_init: Application information:[0m
+[0;32mI (169) app_init: Project name:     solaris_currentsensor[0m
+[0;32mI (175) app_init: App version:      0ef691d-dirty[0m
+[0;32mI (179) app_init: Compile time:     Jun 19 2026 17:00:09[0m
+[0;32mI (184) app_init: ELF file SHA256:  da98f8270...[0m
+[0;32mI (188) app_init: ESP-IDF:          v5.5.2-dirty[0m
+[0;32mI (193) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (197) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (201) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (204) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (211) heap_init: At 3FC96DF8 len 00052918 (330 KiB): RAM[0m
+[0;32mI (216) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (221) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (226) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (233) spi_flash: detected chip: boya[0m
+[0;32mI (235) spi_flash: flash io: dio[0m
+[0;33mW (238) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;33mW (250) i2c: This driver is an old driver, please migrate your application code to adapt `driver/i2c_master.h`[0m
+[0;32mI (260) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (266) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (273) main_task: Started on CPU0[0m
+[0;32mI (283) main_task: Calling app_main()[0m
+[1;31mE (283) SOLARIS_INA2
