@@ -124,7 +124,15 @@ void motor_go_forward(uint8_t motor_id, float duty_cycle)
         if (motor_id <= 1)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to forward
-        gpio_set_level(pins->dir_gpio, 1);
+        // TODO CHANGE THIS TO ONLY WORK WITH LOGIC FROM OPTOCOUPLER LIKE THE IF ID == 1 STATMENT
+        if (motor_id == 1)
+        {
+            gpio_set_level(pins->dir_gpio, 0);
+        }
+        else
+        {
+            gpio_set_level(pins->dir_gpio, 1);
+        }
         // TODO REMOVE HARD CODED INVERSE PINS AFTER DEMO
         if (motor_id == 0)
         {
@@ -154,7 +162,16 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
         if (motor_id <= 1)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to reverse
-        gpio_set_level(pins->dir_gpio, 0);
+        // TODO CHANGE THIS TO ONLY WORK WITH LOGIC FROM OPTOCOUPLER LIKE THE IF ID == 1 STATMENT
+        if (motor_id == 1)
+        {
+            gpio_set_level(pins->dir_gpio, 1);
+        }
+        else
+        {
+            gpio_set_level(pins->dir_gpio, 0);
+        }
+
         // TODO REMOVE HARD CODED INVERSE PINS AFTER DEMO
         if (motor_id == 0)
         {
@@ -178,23 +195,11 @@ void test_motor()
 {
     while (1)
     {
-        // Create your own test code if needed
-        // int pulse_count;
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_forward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_forward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_backward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_backward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        motor_go_forward(2, .75);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        stop_motor(2);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        motor_go_backward(2, .75);
     }
 }

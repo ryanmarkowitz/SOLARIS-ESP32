@@ -15,8 +15,6 @@
 #define ADC_ATTENUATION ADC_ATTEN_DB_12
 #define ADC_BITWIDTH ADC_BITWIDTH_12
 
-adc_oneshot_unit_handle_t adc1_handle;
-adc_cali_handle_t cali_handle;
-
 /* Function Declarations */
 void solar_tracking(void);
+bool init_solar_adc(void);

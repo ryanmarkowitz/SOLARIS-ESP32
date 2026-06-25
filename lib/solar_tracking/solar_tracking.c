@@ -12,9 +12,12 @@ X2 Y2
 
 #define VOLTAGE_TOLERANCE 10
 
+adc_oneshot_unit_handle_t adc1_handle;
+adc_cali_handle_t cali_handle;
+
 const static char *TAG = "SOLAR_ADC";
 
-bool static init_solar_adc(void)
+bool init_solar_adc(void)
 {
     ESP_LOGI(TAG, "Initializing ADC...");
 
@@ -113,12 +116,30 @@ void solar_tracking(void)
         left_right = (voltage_x1 + voltage_x2) - (voltage_y1 + voltage_y2);
         if (left_right > VOLTAGE_TOLERANCE)
         { // The panel needs to rotate left
+            motor_go_forward(PANEL_PAN_ID, .25);
         }
         else if (abs(left_right) > VOLTAGE_TOLERANCE)
         { // The panel needs to rotate right
+            motor_go_backward(PANEL_PAN_ID, .25);
         }
         else
-        {
+        { // Found correct spot stop panning the motor
+            stop_motor(PANEL_PAN_ID);
+        }
+
+        // LEFT RIGHT CHECK
+        top_down = (voltage_x1 + voltage_y1) - (voltage_x1 + voltage_y2);
+        if (top_down > VOLTAGE_TOLERANCE)
+        { // The panel needs to rotate left
+            motor_go_forward(PANEL_TILT_ID, .25);
+        }
+        else if (abs(top_down) > VOLTAGE_TOLERANCE)
+        { // The panel needs to rotate right
+            motor_go_backward(PANEL_TILT_ID, .25);
+        }
+        else
+        { // Found correct spot stop panning the motor
+            stop_motor(PANEL_TILT_ID);
         }
 
         // Wait 1000ms before reading again
