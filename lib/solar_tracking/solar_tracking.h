@@ -16,5 +16,5 @@
 #define ADC_BITWIDTH ADC_BITWIDTH_12
 
 /* Function Declarations */
-void solar_tracking(void);
+void solar_tracking(void *pvParameters);
 bool init_solar_adc(void);

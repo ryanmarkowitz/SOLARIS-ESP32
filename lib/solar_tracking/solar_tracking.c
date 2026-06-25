@@ -66,7 +66,7 @@ bool init_solar_adc(void)
     return calibration_success;
 }
 
-void solar_tracking(void)
+void solar_tracking(void *pvParameters)
 {
     int raw_val_x1 = 0,
         raw_val_x2 = 0,
@@ -127,14 +127,14 @@ void solar_tracking(void)
             stop_motor(PANEL_PAN_ID);
         }
 
-        // LEFT RIGHT CHECK
+        // TOP DOWN CHECK
         top_down = (voltage_x1 + voltage_y1) - (voltage_x1 + voltage_y2);
         if (top_down > VOLTAGE_TOLERANCE)
-        { // The panel needs to rotate left
+        { // The panel needs to pan up
             motor_go_forward(PANEL_TILT_ID, .25);
         }
         else if (abs(top_down) > VOLTAGE_TOLERANCE)
-        { // The panel needs to rotate right
+        { // The panel needs to pan down
             motor_go_backward(PANEL_TILT_ID, .25);
         }
         else

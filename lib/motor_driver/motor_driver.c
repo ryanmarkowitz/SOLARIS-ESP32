@@ -193,7 +193,7 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
     }
 }
 
-void test_motor()
+void test_motor(void *pvParameters)
 {
     while (1)
     {
