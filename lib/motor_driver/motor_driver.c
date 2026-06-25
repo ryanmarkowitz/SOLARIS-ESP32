@@ -128,6 +128,7 @@ void motor_go_forward(uint8_t motor_id, float duty_cycle)
         if (motor_id == 1)
         {
             gpio_set_level(pins->dir_gpio, 0);
+            duty_cycle = 1 - duty_cycle; // inverse the duty cycle for the optocoupler signal
         }
         else
         {
@@ -166,6 +167,7 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
         if (motor_id == 1)
         {
             gpio_set_level(pins->dir_gpio, 1);
+            duty_cycle = 1 - duty_cycle; // inverse the duty cycle for the optocoupler signal
         }
         else
         {
@@ -196,10 +198,10 @@ void test_motor()
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(5000));
-        motor_go_forward(2, .75);
+        motor_go_forward(0, .75);
         vTaskDelay(pdMS_TO_TICKS(5000));
         stop_motor(2);
         vTaskDelay(pdMS_TO_TICKS(5000));
-        motor_go_backward(2, .75);
+        motor_go_backward(0, .75);
     }
 }
