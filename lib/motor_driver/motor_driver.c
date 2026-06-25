@@ -96,6 +96,10 @@ void motor_init(void)
         mcpwm_comparator_set_compare_value(motors[i].comparator, 0);
     }
 
+    // TODO REMOVE THE HARDCODED INVERSE PINS AFTER DEMO
+    gpio_set_direction(13, GPIO_MODE_OUTPUT); // Pan motors inverse direction pin
+    gpio_set_direction(14, GPIO_MODE_OUTPUT); // Tilt motors inverse direction pin
+
     // Start — runs forever in hardware from here
     mcpwm_timer_enable(shared_timer);
     mcpwm_timer_start_stop(shared_timer, MCPWM_TIMER_START_NO_STOP);
@@ -121,6 +125,15 @@ void motor_go_forward(uint8_t motor_id, float duty_cycle)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to forward
         gpio_set_level(pins->dir_gpio, 1);
+        // TODO REMOVE HARD CODED INVERSE PINS AFTER DEMO
+        if (motor_id == 0)
+        {
+            gpio_set_level(13, 0);
+        }
+        else if (motor_id == 1)
+        {
+            gpio_set_level(14, 0);
+        }
 
         mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
         ESP_LOGI(TAG, "Moving the motor #%d forward", motor_id);
@@ -142,6 +155,15 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to reverse
         gpio_set_level(pins->dir_gpio, 0);
+        // TODO REMOVE HARD CODED INVERSE PINS AFTER DEMO
+        if (motor_id == 0)
+        {
+            gpio_set_level(13, 1);
+        }
+        else if (motor_id == 1)
+        {
+            gpio_set_level(14, 1);
+        }
 
         mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
         ESP_LOGI(TAG, "Moving the motor #%d backward", motor_id);
