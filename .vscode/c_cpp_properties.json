@@ -12,6 +12,7 @@
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ultrasonic",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ina228",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_icm20948",
+                "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solar_tracking",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/nimble_init",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_mock_data",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/gap",
@@ -231,7 +232,6 @@
                 "/home/ryan/.platformio/packages/framework-espidf/components/wifi_provisioning/include",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/include",
                 "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/driver",
-                "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solar_tracking",
                 ""
             ],
             "browse": {
@@ -241,6 +241,7 @@
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ultrasonic",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_ina228",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_icm20948",
+                    "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solar_tracking",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/nimble_init",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solaris_mock_data",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/gap",
@@ -460,7 +461,6 @@
                     "/home/ryan/.platformio/packages/framework-espidf/components/wifi_provisioning/include",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/include",
                     "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/driver",
-                    "/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/lib/solar_tracking",
                     ""
                 ]
             },
