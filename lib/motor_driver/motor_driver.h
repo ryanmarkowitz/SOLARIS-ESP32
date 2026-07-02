@@ -43,6 +43,6 @@ void stop_motor(uint8_t panel_id);
 void motor_init();
 void motor_go_forward(uint8_t panel_id, float duty_cycle);
 void motor_go_backward(uint8_t panel_id, float duty_cycle);
-void test_motor();
+void test_motor(void *pvParameters);
 
 #endif

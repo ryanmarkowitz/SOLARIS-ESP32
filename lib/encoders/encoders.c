@@ -103,13 +103,13 @@ static void encoder_handler(void *param)
                 break;
             case TILT_ENCODER_ID:
                 ESP_LOGI(TAG, "Watchpoint reached for tilt motor: %d", evt.watch_point_value);
-                if (evt.watch_point_value >= FORWARD_TARGET_TILT && (evt.dir_level == 1))
+                if (evt.watch_point_value >= FORWARD_TARGET_TILT && (evt.dir_level == 0))
                 {
                     stop_motor(MOTOR_TILT_ID);
                     panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_UPPER_LIMIT);
                     ESP_LOGI(TAG, "Tilt panel at upper limit");
                 }
-                else if (evt.watch_point_value <= BACKWARD_TARGET_TILT && (evt.dir_level == 0))
+                else if (evt.watch_point_value <= BACKWARD_TARGET_TILT && (evt.dir_level == 1))
                 {
                     stop_motor(MOTOR_TILT_ID);
                     panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_LOWER_LIMIT);
@@ -168,7 +168,9 @@ void encoder_init()
         {                                                    // i = 0 or 1 indicates either pan or tilt action meaning direction is needed information
             int forward_max_position, backward_max_position; // used to calcualte max angle the motor can move
             // Increment counter on rising edge when direction pin is forward, deincrement on rising edge when direction pin is reverse
-            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
+
+            // TODO EVENTUALLY ALL ENCODERS NEED TO WORK WITH OPTOCOUPLER. THE ELSE BLOCK WOULD BE THE RIGHT WAY TO DO IT
+            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_DECREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
             ESP_ERROR_CHECK(pcnt_channel_set_level_action(encoders[i].channel_handle, PCNT_CHANNEL_LEVEL_ACTION_KEEP, PCNT_CHANNEL_LEVEL_ACTION_INVERSE));
             if (i == 0)
             {
@@ -179,7 +181,7 @@ void encoder_init()
                 forward_max_position = FORWARD_TARGET_PAN - saved_pan_position;
                 backward_max_position = BACKWARD_TARGET_PAN - saved_pan_position;
             }
-            else
+            else if (i == 1)
             {
                 // return previous position from flash
                 saved_tilt_position = load_position_from_flash(i);
@@ -194,7 +196,7 @@ void encoder_init()
         else
         {
             // just increment counter on rising edge
-            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
+            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_DECREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
             ESP_ERROR_CHECK(pcnt_unit_add_watch_point(encoders[i].pcnt_unit, 0)); // When rolling the counter over, initiaite the callback
         }
         pcnt_unit_clear_count(encoders[i].pcnt_unit);

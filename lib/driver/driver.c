@@ -38,12 +38,3 @@ void driver_function()
         // xQueueRecieve with timeout. Either get instructions or run automatic / stationary again
     }
 }
-
-void write_logs_and_buffers()
-{
-    // TODO make a task that runs every 30 seconds to capture log information and store information in buffers
-    while (1)
-    {
-        vTaskDelay(pdMS_TO_TICKS(30000));
-    }
-}

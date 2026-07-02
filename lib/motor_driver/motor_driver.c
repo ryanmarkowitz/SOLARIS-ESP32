@@ -96,10 +96,6 @@ void motor_init(void)
         mcpwm_comparator_set_compare_value(motors[i].comparator, 0);
     }
 
-    // TODO REMOVE THE HARDCODED INVERSE PINS AFTER DEMO
-    gpio_set_direction(13, GPIO_MODE_OUTPUT); // Pan motors inverse direction pin
-    gpio_set_direction(14, GPIO_MODE_OUTPUT); // Tilt motors inverse direction pin
-
     // Start — runs forever in hardware from here
     mcpwm_timer_enable(shared_timer);
     mcpwm_timer_start_stop(shared_timer, MCPWM_TIMER_START_NO_STOP);
@@ -124,16 +120,8 @@ void motor_go_forward(uint8_t motor_id, float duty_cycle)
         if (motor_id <= 1)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to forward
-        gpio_set_level(pins->dir_gpio, 1);
-        // TODO REMOVE HARD CODED INVERSE PINS AFTER DEMO
-        if (motor_id == 0)
-        {
-            gpio_set_level(13, 0);
-        }
-        else if (motor_id == 1)
-        {
-            gpio_set_level(14, 0);
-        }
+        gpio_set_level(pins->dir_gpio, 0);
+        duty_cycle = 1 - duty_cycle;
 
         mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
         ESP_LOGI(TAG, "Moving the motor #%d forward", motor_id);
@@ -154,16 +142,8 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
         if (motor_id <= 1)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to reverse
-        gpio_set_level(pins->dir_gpio, 0);
-        // TODO REMOVE HARD CODED INVERSE PINS AFTER DEMO
-        if (motor_id == 0)
-        {
-            gpio_set_level(13, 1);
-        }
-        else if (motor_id == 1)
-        {
-            gpio_set_level(14, 1);
-        }
+        gpio_set_level(pins->dir_gpio, 1);
+        duty_cycle = 1 - duty_cycle;
 
         mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
         ESP_LOGI(TAG, "Moving the motor #%d backward", motor_id);
@@ -174,27 +154,15 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
     }
 }
 
-void test_motor()
+void test_motor(void *pvParameters)
 {
     while (1)
     {
-        // Create your own test code if needed
-        // int pulse_count;
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_forward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_forward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_backward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
-        // pulse_count = get_pulse_count();
-        // ESP_LOGI(TAG, "Current Pulse Position: %d", pulse_count);
-        // motor_go_backward(0);
-        // vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        motor_go_forward(0, .75);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        stop_motor(2);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        motor_go_backward(0, .75);
     }
 }
