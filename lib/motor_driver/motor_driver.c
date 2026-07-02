@@ -70,10 +70,9 @@ void motor_init()
 
     // Direction GPIO
     gpio_set_direction(DIR_PIN, GPIO_MODE_INPUT_OUTPUT);
-    gpio_set_direction(INV_DIR_PIN, GPIO_MODE_OUTPUT);
 
     // Set Duty cycle to 0% at init
-    mcpwm_comparator_set_compare_value(motor_comparator, 0);
+    mcpwm_comparator_set_compare_value(motor_comparator, 50);
 
     // Start — runs forever in hardware from here
     mcpwm_timer_enable(timer);
@@ -83,7 +82,7 @@ void motor_init()
 // Set duty cycle to 0 for the motor to stop it
 void stop_motor()
 {
-    mcpwm_comparator_set_compare_value(motor_comparator, 0);
+    mcpwm_comparator_set_compare_value(motor_comparator, 50);
     vTaskDelay(pdMS_TO_TICKS(100)); // small delay before saving position to flash in case motor kept moving forward for some time
     save_position_to_flash();
 }
@@ -95,10 +94,9 @@ void motor_go_forward()
     {
         s_state = PANEL_OK;
         // set the motors direction to forward
-        gpio_set_level(DIR_PIN, 1);
-        gpio_set_level(INV_DIR_PIN, 0);
+        gpio_set_level(DIR_PIN, 0);
 
-        mcpwm_comparator_set_compare_value(motor_comparator, 10);
+        mcpwm_comparator_set_compare_value(motor_comparator, 40);
         ESP_LOGI(TAG, "Moving the motors forward");
     }
     else
@@ -114,10 +112,9 @@ void motor_go_backward()
     {
         s_state = PANEL_OK;
         // set the motors direction to reverse
-        gpio_set_level(DIR_PIN, 0);
-        gpio_set_level(INV_DIR_PIN, 1);
+        gpio_set_level(DIR_PIN, 1);
 
-        mcpwm_comparator_set_compare_value(motor_comparator, 10);
+        mcpwm_comparator_set_compare_value(motor_comparator, 40);
         ESP_LOGI(TAG, "Moving the motors backward");
     }
     else

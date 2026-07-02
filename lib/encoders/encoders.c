@@ -126,7 +126,7 @@ void encoder_init()
     ESP_ERROR_CHECK(pcnt_new_channel(pcnt_unit1, &chan_config1, &pcnt_chan1));
 
     // Increment counter on rising edge when direction pin is forward, deincrement on rising edge when direction pin is reverse
-    ESP_ERROR_CHECK(pcnt_channel_set_edge_action(pcnt_chan1, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
+    ESP_ERROR_CHECK(pcnt_channel_set_edge_action(pcnt_chan1, PCNT_CHANNEL_EDGE_ACTION_DECREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
     ESP_ERROR_CHECK(pcnt_channel_set_level_action(pcnt_chan1, PCNT_CHANNEL_LEVEL_ACTION_KEEP, PCNT_CHANNEL_LEVEL_ACTION_INVERSE));
 
     // return previous position from flash
