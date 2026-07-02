@@ -13,15 +13,14 @@
 #include "driver/gpio.h"
 #include "esp_rom_sys.h"
 #include "esp_log.h"
-<<<<<<< HEAD
 #include "esp_adc/adc_cali_scheme.h"
-=======
 #include "solar_tracking.h"
 #include <motor_driver.h>
 #include <stdlib.h>
 #include "freertos/semphr.h"
-#include "semaphores_mutex.h"
->>>>>>> origin/midterm-demo
+#include "shared_resources.h"
+
+#define VOLTAGE_TOLERANCE 10
 
 static const char *TAG = "SOLARIS_PT";
 
@@ -29,7 +28,6 @@ static const char *TAG = "SOLARIS_PT";
 // Internal context
 // ---------------------------------------------------------------------------
 
-<<<<<<< HEAD
 struct solaris_pt_ctx_t {
     solaris_pt_config_t       cfg;
     adc_oneshot_unit_handle_t adc_handle;
@@ -42,14 +40,6 @@ struct solaris_pt_ctx_t {
 // ---------------------------------------------------------------------------
 
 static void prv_gpio_output(int gpio)
-=======
-adc_oneshot_unit_handle_t adc1_handle;
-adc_cali_handle_t cali_handle;
-
-const static char *TAG = "SOLAR_ADC";
-
-bool init_solar_adc(void)
->>>>>>> origin/midterm-demo
 {
     gpio_reset_pin(gpio);
     gpio_set_direction(gpio, GPIO_MODE_OUTPUT);
@@ -191,11 +181,20 @@ esp_err_t solaris_pt_read_single(solaris_pt_handle_t handle, int index,
     return ESP_OK;
 }
 
-esp_err_t solaris_pt_read(solaris_pt_handle_t handle, solaris_pt_result_t *results)
+esp_err_t solaris_pt_read(solaris_pt_handle_t handle, solaris_pt_result_t *results, bool is_pan_tilt_sensors)
 {
+    int i, end_idx;
+    if(is_pan_tilt_sensors){
+        i = 0;
+        end_idx = 4;
+    }
+    else{
+        i=4;
+        end_idx=8;
+    }
     if (!handle || !results) return ESP_ERR_INVALID_ARG;
 
-    for (int i = 0; i < handle->cfg.num_sensors; i++) {
+    for (int i = i; i < end_idx; i++) {
         esp_err_t err = solaris_pt_read_single(handle, i, &results[i]);
         if (err != ESP_OK) return err;
     }
@@ -228,20 +227,7 @@ esp_err_t solaris_pt_deinit(solaris_pt_handle_t handle)
 
 void solar_tracking(void *pvParameters)
 {
-    int raw_val_x1 = 0,
-        raw_val_x2 = 0,
-        raw_val_y1 = 0,
-        raw_val_y2 = 0;
-
-    int sum_raw_x1 = 0,
-        sum_raw_x2 = 0,
-        sum_raw_y1 = 0,
-        sum_raw_y2 = 0;
-
-    int voltage_x1 = 0,
-        voltage_x2 = 0,
-        voltage_y1 = 0,
-        voltage_y2 = 0;
+    
 
     int left_right = 0,
         top_down = 0;

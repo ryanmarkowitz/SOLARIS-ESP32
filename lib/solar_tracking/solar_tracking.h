@@ -167,7 +167,7 @@ esp_err_t solaris_pt_init(const solaris_pt_config_t *config,
  */
 esp_err_t solaris_pt_read(solaris_pt_handle_t  handle,
                           solaris_pt_result_t *results,
-                          bool reading_tilt_panel_sensors);
+                          bool is_pan_tilt_sensors);
 
 /**
  * @brief  Read a single sensor by index.
@@ -186,6 +186,8 @@ esp_err_t solaris_pt_read_single(solaris_pt_handle_t  handle,
  */
 void solaris_pt_log(solaris_pt_handle_t        handle,
                     const solaris_pt_result_t *results);
+
+void solar_tracking(void *pvParameters);                    
 
 /**
  * @brief  Free all resources and invalidate the handle.
