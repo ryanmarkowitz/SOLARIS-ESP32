@@ -9,11 +9,11 @@
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
   },
-  "clangd.path": "C:\\Espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
+  "clangd.path": "/home/ryan/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
   "clangd.arguments": [
     "--background-index",
     "--query-driver=**",
-    "--compile-commands-dir=c:\\Users\\forti\\solaris_phototransistor\\build"
+    "--compile-commands-dir=/home/ryan/Documents/SOLARIS_ESP32/SOLARIS-ESP32/build"
   ],
   "idf.flashType": "UART"
 }
