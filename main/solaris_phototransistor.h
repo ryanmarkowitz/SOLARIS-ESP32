@@ -106,9 +106,9 @@ typedef struct {
  * @endcode
  */
 #define SOLARIS_PT_CONFIG_DEFAULT() {                   \
-    .mux_sel_a     = 15,                                \
-    .mux_sel_b     = 16,                                \
-    .mux_sel_c     = 17,                                \    
+    .mux_sel_a     = 10,                                \
+    .mux_sel_b     = 12,                                \
+    .mux_sel_c     = 13,                                \    
     .adc_unit      = ADC_UNIT_2,                        \
     .adc_channel   = ADC_CHANNEL_0,  /* GPIO11 */       \
     .adc_atten     = ADC_ATTEN_DB_12,                   \
