@@ -170,25 +170,18 @@ void encoder_init()
             // Increment counter on rising edge when direction pin is forward, deincrement on rising edge when direction pin is reverse
 
             // TODO EVENTUALLY ALL ENCODERS NEED TO WORK WITH OPTOCOUPLER. THE ELSE BLOCK WOULD BE THE RIGHT WAY TO DO IT
-            if (i == 0)
-            {
-                ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
-            }
-            else
-            {
-                ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_DECREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
-            }
+            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_DECREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
             ESP_ERROR_CHECK(pcnt_channel_set_level_action(encoders[i].channel_handle, PCNT_CHANNEL_LEVEL_ACTION_KEEP, PCNT_CHANNEL_LEVEL_ACTION_INVERSE));
             if (i == 0)
             {
                 // return previous position from flash
                 saved_pan_position = load_position_from_flash(i);
 
-                vTaskDelay(pdMS_TO_TICKS(5000)); // Set watchpoint endpoints to relative position rather than the counter's absolute position
+                // Set watchpoint endpoints to relative position rather than the counter's absolute position
                 forward_max_position = FORWARD_TARGET_PAN - saved_pan_position;
                 backward_max_position = BACKWARD_TARGET_PAN - saved_pan_position;
             }
-            else
+            else if (i == 1)
             {
                 // return previous position from flash
                 saved_tilt_position = load_position_from_flash(i);
@@ -203,7 +196,7 @@ void encoder_init()
         else
         {
             // just increment counter on rising edge
-            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
+            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_DECREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
             ESP_ERROR_CHECK(pcnt_unit_add_watch_point(encoders[i].pcnt_unit, 0)); // When rolling the counter over, initiaite the callback
         }
         pcnt_unit_clear_count(encoders[i].pcnt_unit);

@@ -4,6 +4,8 @@
 #include "solar_tracking.h"
 #include <motor_driver.h>
 #include <stdlib.h>
+#include "freertos/semphr.h"
+#include "semaphores_mutex.h"
 
 /*
 X1 Y1
@@ -85,65 +87,71 @@ void solar_tracking(void *pvParameters)
 
     int left_right = 0,
         top_down = 0;
+
     while (1)
     {
-        // Read Raw Values (0 to 4095)
-        for (int i = 0; i <= 4; i++)
+        // If drive motors are not currently moving, try to move the panels
+        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
         {
-            ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_X1_CHANNEL, &raw_val_x1));
-            ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_X2_CHANNEL, &raw_val_x2));
-            ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_Y1_CHANNEL, &raw_val_y1));
-            ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_Y2_CHANNEL, &raw_val_y2));
+            // Read Raw Values (0 to 4095)
+            for (int i = 0; i <= 4; i++)
+            {
+                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_X1_CHANNEL, &raw_val_x1));
+                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_X2_CHANNEL, &raw_val_x2));
+                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_Y1_CHANNEL, &raw_val_y1));
+                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, SENSOR_Y2_CHANNEL, &raw_val_y2));
 
-            sum_raw_x1 += raw_val_x1;
-            sum_raw_x2 += raw_val_x2;
-            sum_raw_y1 += raw_val_y1;
-            sum_raw_y2 += raw_val_y2;
-        }
+                sum_raw_x1 += raw_val_x1;
+                sum_raw_x2 += raw_val_x2;
+                sum_raw_y1 += raw_val_y1;
+                sum_raw_y2 += raw_val_y2;
+            }
 
-        sum_raw_x1 /= 5; // Average of 5 readings
-        sum_raw_x2 /= 5;
-        sum_raw_y1 /= 5;
-        sum_raw_y2 /= 5;
+            sum_raw_x1 /= 5; // Average of 5 readings
+            sum_raw_x2 /= 5;
+            sum_raw_y1 /= 5;
+            sum_raw_y2 /= 5;
 
-        // Convert to Millivolts (mV) using the calibration profile
-        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_x1, &voltage_x1));
-        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_x2, &voltage_x2));
-        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_y1, &voltage_y1));
-        ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_y2, &voltage_y2));
+            // Convert to Millivolts (mV) using the calibration profile
+            ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_x1, &voltage_x1));
+            ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_x2, &voltage_x2));
+            ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_y1, &voltage_y1));
+            ESP_ERROR_CHECK(adc_cali_raw_to_voltage(cali_handle, sum_raw_y2, &voltage_y2));
 
-        // LEFT RIGHT CHECK
-        left_right = (voltage_x1 + voltage_x2) - (voltage_y1 + voltage_y2);
-        if (left_right > VOLTAGE_TOLERANCE)
-        { // The panel needs to rotate left
-            motor_go_forward(PANEL_PAN_ID, .25);
-        }
-        else if (abs(left_right) > VOLTAGE_TOLERANCE)
-        { // The panel needs to rotate right
-            motor_go_backward(PANEL_PAN_ID, .25);
-        }
-        else
-        { // Found correct spot stop panning the motor
-            stop_motor(PANEL_PAN_ID);
-        }
+            // LEFT RIGHT CHECK
+            left_right = (voltage_x1 + voltage_x2) - (voltage_y1 + voltage_y2);
+            if (left_right > VOLTAGE_TOLERANCE)
+            { // The panel needs to rotate left
+                motor_go_forward(PANEL_PAN_ID, .25);
+            }
+            else if (abs(left_right) > VOLTAGE_TOLERANCE)
+            { // The panel needs to rotate right
+                motor_go_backward(PANEL_PAN_ID, .25);
+            }
+            else
+            { // Found correct spot stop panning the motor
+                stop_motor(PANEL_PAN_ID);
+            }
 
-        // TOP DOWN CHECK
-        top_down = (voltage_x1 + voltage_y1) - (voltage_x1 + voltage_y2);
-        if (top_down > VOLTAGE_TOLERANCE)
-        { // The panel needs to pan up
-            motor_go_forward(PANEL_TILT_ID, .25);
-        }
-        else if (abs(top_down) > VOLTAGE_TOLERANCE)
-        { // The panel needs to pan down
-            motor_go_backward(PANEL_TILT_ID, .25);
-        }
-        else
-        { // Found correct spot stop panning the motor
-            stop_motor(PANEL_TILT_ID);
+            // TOP DOWN CHECK
+            top_down = (voltage_x1 + voltage_y1) - (voltage_x1 + voltage_y2);
+            if (top_down > VOLTAGE_TOLERANCE)
+            { // The panel needs to pan up
+                motor_go_forward(PANEL_TILT_ID, .25);
+            }
+            else if (abs(top_down) > VOLTAGE_TOLERANCE)
+            { // The panel needs to pan down
+                motor_go_backward(PANEL_TILT_ID, .25);
+            }
+            else
+            { // Found correct spot stop panning the motor
+                stop_motor(PANEL_TILT_ID);
+            }
+            xSemaphoreGive(actuator_mutex);
         }
 
         // Wait 1000ms before reading again
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(250));
     }
 
     // Cleanup ADC resources

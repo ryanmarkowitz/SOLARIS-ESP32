@@ -12,8 +12,6 @@
 #include <solaris_ultrasonic.h>
 #include <solar_tracking.h>
 
-#define LOOP_DELAY_MS 500
-
 #define TAG "Main"
 
 void app_main(void)
