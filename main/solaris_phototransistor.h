@@ -116,7 +116,7 @@ typedef struct {
     .adc_samples   = 16,                                \
     .num_sensors   = 8,                                 \
     .channel_map   = { 0, 1, 2, 3, 4, 5, 6, 7 },        \
-    .mux_settle_us = 50,                               \
+    .mux_settle_us = 80,                                \
 }
 
 // ---------------------------------------------------------------------------
