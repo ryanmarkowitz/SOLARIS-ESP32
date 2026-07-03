@@ -14,12 +14,15 @@
 #define LOW_LIMIT -32768
 #define HIGH_LIMIT 32767
 #define HIGH_LIMIT_FR 28387
-#define FORWARD_TARGET_PAN 108     // maps to 30 degrees
-#define BACKWARD_TARGET_PAN -108   // maps to -30 degrees
-#define FORWARD_TARGET_TILT 1300   // maps to +360 degrees
-#define BACKWARD_TARGET_TILT -1300 // maps to -360 degrees
+#define FORWARD_TARGET_PAN 1300   // maps to 360 degrees
+#define BACKWARD_TARGET_PAN -1300 // maps to -360 degrees
+#define FORWARD_TARGET_TILT 108   // maps to +30 degrees
+#define BACKWARD_TARGET_TILT -108 // maps to -30 degrees
 
 static int load_position_from_flash(uint8_t encoder_id);
+static encoder_ctxt_t enc_ctxt[4];
+
+static int forward_max_position, backward_max_position;
 
 /*
 Pan encoder - Pin 30 | Dir - Pin 11
@@ -29,8 +32,8 @@ FR encoder - Pin 26
 */
 
 static const encoder_pins_t encoder_pins[NUM_ENCODERS] = {
-    {.encoder_gpio = 30, .dir_gpio = 11},
-    {.encoder_gpio = 28, .dir_gpio = 31},
+    {.encoder_gpio = 37, .dir_gpio = 11},
+    {.encoder_gpio = 36, .dir_gpio = 40},
     {.encoder_gpio = 35, .dir_gpio = -1},
     {.encoder_gpio = 26, .dir_gpio = -1}};
 
@@ -83,18 +86,22 @@ static void encoder_handler(void *param)
     {
         // wait for queue to be sent from on_encoder_limit_reached ISR
         if (xQueueReceive(encoder_queue, &evt, portMAX_DELAY))
+            ESP_LOGI(TAG, "ISR Triggered");
+        ESP_LOGI(TAG, "evt id: %d", evt.id);
+        ESP_LOGI(TAG, "evt dir %d", evt.dir_level);
+        ESP_LOGI(TAG, "evt watch point %d", evt.watch_point_value);
         {
             switch (evt.id)
             {
             case PAN_ENCODER_ID:
                 ESP_LOGI(TAG, "Watchpoint reached for pan motor: %d", evt.watch_point_value);
-                if (evt.watch_point_value >= FORWARD_TARGET_PAN && (evt.dir_level == 1))
+                if (evt.watch_point_value >= forward_max_position && (evt.dir_level == 0))
                 {
                     stop_motor(MOTOR_PAN_ID);
                     panel_set_limit_state(PANEL_PAN_ID, PANEL_AT_UPPER_LIMIT);
                     ESP_LOGI(TAG, "Pan panel at upper limit");
                 }
-                else if (evt.watch_point_value <= BACKWARD_TARGET_PAN && (evt.dir_level == 0))
+                else if (evt.watch_point_value <= backward_max_position && (evt.dir_level == 1))
                 {
                     stop_motor(MOTOR_PAN_ID);
                     panel_set_limit_state(PANEL_PAN_ID, PANEL_AT_LOWER_LIMIT);
@@ -145,7 +152,6 @@ void encoder_init()
 
     // initialzie the queue size for an encoder event
     encoder_queue = xQueueCreate(16, sizeof(encoder_evt_t));
-    encoder_ctxt_t enc_ctxt[4];
 
     // configure most encoders to have the max high and low limit
     for (int i = 0; i < NUM_ENCODERS - 1; i++)
@@ -165,8 +171,7 @@ void encoder_init()
         };
         ESP_ERROR_CHECK(pcnt_new_channel(encoders[i].pcnt_unit, &chan_config, &encoders[i].channel_handle));
         if (i <= 1)
-        {                                                    // i = 0 or 1 indicates either pan or tilt action meaning direction is needed information
-            int forward_max_position, backward_max_position; // used to calcualte max angle the motor can move
+        { // i = 0 or 1 indicates either pan or tilt action meaning direction is needed information
             // Increment counter on rising edge when direction pin is forward, deincrement on rising edge when direction pin is reverse
 
             // TODO EVENTUALLY ALL ENCODERS NEED TO WORK WITH OPTOCOUPLER. THE ELSE BLOCK WOULD BE THE RIGHT WAY TO DO IT
@@ -196,7 +201,7 @@ void encoder_init()
         else
         {
             // just increment counter on rising edge
-            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_DECREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
+            ESP_ERROR_CHECK(pcnt_channel_set_edge_action(encoders[i].channel_handle, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
             ESP_ERROR_CHECK(pcnt_unit_add_watch_point(encoders[i].pcnt_unit, 0)); // When rolling the counter over, initiaite the callback
         }
         pcnt_unit_clear_count(encoders[i].pcnt_unit);

@@ -30,9 +30,9 @@ void app_main(void)
 
     encoder_init();
     motor_init();
-    init_solar_adc();
+    // init_solar_adc();
 
     // IF YOU GET STACK OVERFLOW ERRORS CHANGE 4096 TO HIGHER NUMBER AS THIS IS THE STACK DEPTH ALLOCATION
-    xTaskCreate(solar_tracking, "solar tracking", 4096, NULL, 15, NULL);
-    // xTaskCreate(test_motor(), "test drive", 4096, NULL, 8, NULL);    UNCOMMENT AND CALL THIS FUNCTION FOR STRAIGHT LINE DEMO. MAKE SURE TO COMMENT OUT THE xTaskCreate FUNCTION ABOVE FIRST!!!
+    // xTaskCreate(solar_tracking, "solar tracking", 4096, NULL, 15, NULL);
+    xTaskCreate(test_motor, "test drive", 4096, NULL, 8, NULL);
 }
