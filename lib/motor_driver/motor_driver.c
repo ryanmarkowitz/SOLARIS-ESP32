@@ -22,11 +22,11 @@ MOTOR 4 - REAR LEFT MOTOR
 MOTOR 5 - REAR RIGHT MOTOR
 */
 static const motor_pins_t motor_pins[NUM_MOTORS] = {
-    {.pwm_gpio = 10, .dir_gpio = 11},
-    {.pwm_gpio = 20, .dir_gpio = 40},
+    {.pwm_gpio = 17, .dir_gpio = 18},
+    {.pwm_gpio = 21, .dir_gpio = 38},
     {.pwm_gpio = 4, .dir_gpio = 7},
     {.pwm_gpio = 6, .dir_gpio = 9},
-    {.pwm_gpio = 12, .dir_gpio = 7},
+    {.pwm_gpio = 8, .dir_gpio = 7},
     {.pwm_gpio = 15, .dir_gpio = 9}};
 
 static motor_t motors[NUM_MOTORS];
@@ -110,6 +110,7 @@ void stop_motor(uint8_t motor_id)
     vTaskDelay(pdMS_TO_TICKS(100)); // small delay before saving position to flash in case motor kept moving forward for some time
     if (motor_id <= 1)
         save_position_to_flash(motor_id);
+    ESP_LOGI(TAG, "motor #%d stopping", motor_id);
 }
 
 // makes motor go forward at duty_cycle%
@@ -130,6 +131,7 @@ void motor_go_forward(uint8_t motor_id, float duty_cycle)
     }
     else
     {
+        stop_motor(motor_id);
         ESP_LOGI(TAG, "Trying to move panel forward, but upper limit is reached for motor #%d", motor_id);
     }
 }
@@ -152,6 +154,7 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
     }
     else
     {
+        stop_motor(motor_id);
         ESP_LOGI(TAG, "Trying to move panel backward but lower limit is reached for motor #%d", motor_id);
     }
 }
@@ -161,26 +164,27 @@ void test_motor(void *pvParameters)
     int pulse_count;
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(5000));
-        stop_motor(1);
-        pulse_count = get_pulse_count(1);
-        ESP_LOGI(TAG, "Pulse Count of Tilt motor: %d", pulse_count);
-        motor_go_forward(0, .25);
 
-        vTaskDelay(pdMS_TO_TICKS(5000));
-        stop_motor(0);
-        pulse_count = get_pulse_count(0);
-        ESP_LOGI(TAG, "Pulse Count of Pan motor: %d", pulse_count);
-        motor_go_forward(1, .25);
-        vTaskDelay(pdMS_TO_TICKS(5000));
         stop_motor(1);
         pulse_count = get_pulse_count(1);
-        ESP_LOGI(TAG, "Pulse Count of Tilt motor: %d", pulse_count);
-        motor_go_backward(0, .25);
+        ESP_LOGI(TAG, "Pulse Count of pan motor: %d", pulse_count);
+        motor_go_backward(1, .15);
         vTaskDelay(pdMS_TO_TICKS(5000));
-        stop_motor(0);
-        pulse_count = get_pulse_count(0);
-        ESP_LOGI(TAG, "Pulse Count of Pan motor: %d", pulse_count);
-        motor_go_backward(1, .25);
+
+        // vTaskDelay(pdMS_TO_TICKS(5000));
+        // stop_motor(0);
+        // pulse_count = get_pulse_count(0);
+        // ESP_LOGI(TAG, "Pulse Count of Pan motor: %d", pulse_count);
+        // motor_go_forward(1, .15);
+        // vTaskDelay(pdMS_TO_TICKS(5000));
+        // stop_motor(1);
+        // pulse_count = get_pulse_count(1);
+        // ESP_LOGI(TAG, "Pulse Count of Tilt motor: %d", pulse_count);
+        // motor_go_backward(0, .15);
+        // vTaskDelay(pdMS_TO_TICKS(5000));
+        // stop_motor(0);
+        // pulse_count = get_pulse_count(0);
+        // ESP_LOGI(TAG, "Pulse Count of Pan motor: %d", pulse_count);
+        // motor_go_backward(1, .15);
     }
 }

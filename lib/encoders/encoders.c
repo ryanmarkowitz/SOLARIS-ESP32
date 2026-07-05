@@ -14,10 +14,10 @@
 #define LOW_LIMIT -32768
 #define HIGH_LIMIT 32767
 #define HIGH_LIMIT_FR 28387
-#define FORWARD_TARGET_PAN 1300   // maps to 360 degrees
-#define BACKWARD_TARGET_PAN -1300 // maps to -360 degrees
-#define FORWARD_TARGET_TILT 108   // maps to +30 degrees
-#define BACKWARD_TARGET_TILT -108 // maps to -30 degrees
+#define FORWARD_TARGET_PAN 2650   // maps to 360 degrees
+#define BACKWARD_TARGET_PAN -2650 // maps to -360 degrees
+#define FORWARD_TARGET_TILT 350   // maps to +30 degrees
+#define BACKWARD_TARGET_TILT -350 // maps to -30 degrees
 
 static int load_position_from_flash(uint8_t encoder_id);
 static encoder_ctxt_t enc_ctxt[4];
@@ -32,10 +32,10 @@ FR encoder - Pin 26
 */
 
 static const encoder_pins_t encoder_pins[NUM_ENCODERS] = {
-    {.encoder_gpio = 37, .dir_gpio = 11},
-    {.encoder_gpio = 36, .dir_gpio = 40},
-    {.encoder_gpio = 35, .dir_gpio = -1},
-    {.encoder_gpio = 26, .dir_gpio = -1}};
+    {.encoder_gpio = 37, .dir_gpio = 18},
+    {.encoder_gpio = 35, .dir_gpio = 38},
+    {.encoder_gpio = 42, .dir_gpio = -1},
+    {.encoder_gpio = 45, .dir_gpio = -1}};
 
 /*
 ENCODER 0 - PAN ENCODER
@@ -110,13 +110,13 @@ static void encoder_handler(void *param)
                 break;
             case TILT_ENCODER_ID:
                 ESP_LOGI(TAG, "Watchpoint reached for tilt motor: %d", evt.watch_point_value);
-                if (evt.watch_point_value >= FORWARD_TARGET_TILT && (evt.dir_level == 0))
+                if (evt.watch_point_value >= forward_max_position && (evt.dir_level == 0))
                 {
                     stop_motor(MOTOR_TILT_ID);
                     panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_UPPER_LIMIT);
                     ESP_LOGI(TAG, "Tilt panel at upper limit");
                 }
-                else if (evt.watch_point_value <= BACKWARD_TARGET_TILT && (evt.dir_level == 1))
+                else if (evt.watch_point_value <= backward_max_position && (evt.dir_level == 1))
                 {
                     stop_motor(MOTOR_TILT_ID);
                     panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_LOWER_LIMIT);
@@ -185,6 +185,19 @@ void encoder_init()
                 // Set watchpoint endpoints to relative position rather than the counter's absolute position
                 forward_max_position = FORWARD_TARGET_PAN - saved_pan_position;
                 backward_max_position = BACKWARD_TARGET_PAN - saved_pan_position;
+
+                if (forward_max_position <= 0)
+                {
+                    forward_max_position = 0;
+                    panel_set_limit_state(PAN_ENCODER_ID, PANEL_AT_UPPER_LIMIT);
+                }
+                else if (backward_max_position >= 0)
+                {
+                    backward_max_position = 0;
+                    panel_set_limit_state(PAN_ENCODER_ID, PANEL_AT_LOWER_LIMIT);
+                }
+                ESP_LOGI(TAG, "forward max position for pan: %d", forward_max_position);
+                ESP_LOGI(TAG, "backward max position for pan %d", backward_max_position);
             }
             else if (i == 1)
             {
@@ -194,6 +207,20 @@ void encoder_init()
                 // Set watchpoint endpoints to relative position rather than the counter's absolute position
                 forward_max_position = FORWARD_TARGET_TILT - saved_tilt_position;
                 backward_max_position = BACKWARD_TARGET_TILT - saved_tilt_position;
+
+                if (forward_max_position <= 0)
+                {
+                    forward_max_position = 0;
+                    panel_set_limit_state(TILT_ENCODER_ID, PANEL_AT_UPPER_LIMIT);
+                }
+                else if (backward_max_position >= 0)
+                {
+                    backward_max_position = 0;
+                    panel_set_limit_state(TILT_ENCODER_ID, PANEL_AT_LOWER_LIMIT);
+                }
+
+                ESP_LOGI(TAG, "forward max position for tilt: %d", forward_max_position);
+                ESP_LOGI(TAG, "backward max position for tilt %d", backward_max_position);
             }
             ESP_ERROR_CHECK(pcnt_unit_add_watch_point(encoders[i].pcnt_unit, forward_max_position));
             ESP_ERROR_CHECK(pcnt_unit_add_watch_point(encoders[i].pcnt_unit, backward_max_position));
@@ -220,7 +247,7 @@ void encoder_init()
     }
 
     // create the task for the encoder handler function
-    xTaskCreate(encoder_handler, "encoder_handler", 4096, encoder_queue, 10, NULL);
+    xTaskCreate(encoder_handler, "encoder_handler", 4096, encoder_queue, 18, NULL);
 
     // enable and start the PCNT units
     for (int i = 0; i < NUM_ENCODERS; i++)
@@ -270,7 +297,8 @@ static int load_position_from_flash(uint8_t encoder_id)
         ESP_LOGI(TAG, "Position loaded from flash: %d", (int)position);
     }
     nvs_close(nvs_handle);
-    return position;
+    // return position;
+    return 0;
 }
 
 // when motor drivers are done moving the panel, save the position to flash
@@ -286,7 +314,8 @@ esp_err_t save_position_to_flash(uint8_t encoder_id)
     int position;
     ESP_ERROR_CHECK(pcnt_unit_get_count(encoders[encoder_id].pcnt_unit, &position));
     int saved_pan_or_tilt = (encoder_id == PAN_ENCODER_ID) ? saved_pan_position : saved_tilt_position;
-    int absolute_position = position + saved_pan_or_tilt;
+    // int absolute_position = position + saved_pan_or_tilt;
+    int absolute_position = 0;
 
     err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
     if (err != ESP_OK)

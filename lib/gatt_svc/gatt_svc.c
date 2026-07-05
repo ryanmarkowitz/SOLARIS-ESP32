@@ -27,10 +27,13 @@
 #include "gatt_svc.h"
 
 #include "solaris_common.h"
-#include "solaris_mode.h"
+#include <solaris_mode.h>
 #include "solaris_telemetry.h"
 #include "solaris_weather.h"
 #include "solaris_manual_ctrl.h"
+#include <motor_driver.h>
+#include "shared_resources.h"
+#include "freertos/queue.h"
 
 #include "esp_log.h"
 #include <sys/time.h>
@@ -166,7 +169,6 @@ static inline void put_u32_le(uint8_t *dst, uint32_t v)
     dst[2] = (uint8_t)(v >> 16);
     dst[3] = (uint8_t)(v >> 24);
 }
-
 
 // get 32 bit value
 static inline uint32_t get_u32_le(const uint8_t *p)
@@ -353,6 +355,11 @@ static int handle_mode_write(struct ble_gatt_access_ctxt *ctxt)
     uint8_t requested_mode = ctxt->om->om_data[0];
     if (!solaris_mode_set_from_u8(requested_mode))
         return BLE_ATT_ERR_UNLIKELY;
+    solaris_mode_t mode = solaris_mode_get();
+    if (xQueueSend(xModeQueue, (void *)&mode, (TickType_t)(10)) != pdPASS)
+    {
+        ESP_LOGE(TAG, "Queue was unable to send");
+    }
 
     ESP_LOGI(TAG, "mode changed to %s", solaris_mode_to_str(solaris_mode_get()));
     return 0;
@@ -413,6 +420,68 @@ static int handle_manual_ctrl_write(struct ble_gatt_access_ctxt *ctxt)
     int8_t throttle;
     int8_t steering;
     solaris_manual_ctrl_get(&throttle, &steering);
+
+    // Assume only throttle or steering is used. Not both at the same time
+
+    // If both throttle and steering commands are 0, stop moving all drive motors
+    if (throttle == 0 && steering == 0)
+    {
+        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
+        {
+            stop_motor(MOTOR_FL_ID);
+            stop_motor(MOTOR_FR_ID);
+            stop_motor(MOTOR_RL_ID);
+            stop_motor(MOTOR_RR_ID);
+            xSemaphoreGive(actuator_mutex);
+        }
+    }
+    else if (throttle > 0)
+    { // move forward
+        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
+        {
+            motor_go_forward(MOTOR_FL_ID, (throttle / 127) * .75);
+            motor_go_forward(MOTOR_FR_ID, (throttle / 127) * .75);
+            motor_go_forward(MOTOR_RL_ID, (throttle / 127) * .75);
+            motor_go_forward(MOTOR_RR_ID, (throttle / 127) * .75);
+            xSemaphoreGive(actuator_mutex);
+        }
+    }
+    else if (throttle < 0)
+    { // move backward
+        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
+        {
+            motor_go_backward(MOTOR_FL_ID, (abs(throttle) / 127) * .75);
+            motor_go_backward(MOTOR_FR_ID, (abs(throttle) / 127) * .75);
+            motor_go_backward(MOTOR_RL_ID, (abs(throttle) / 127) * .75);
+            motor_go_backward(MOTOR_RR_ID, (abs(throttle) / 127) * .75);
+            xSemaphoreGive(actuator_mutex);
+        }
+    }
+
+    else if (steering > 0)
+    { // turn right
+        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
+        {
+            motor_go_forward(MOTOR_FL_ID, (throttle / 127) * .75);
+            motor_go_forward(MOTOR_RL_ID, (throttle / 127) * .75);
+            motor_go_backward(MOTOR_FR_ID, (throttle / 127) * .75);
+            motor_go_backward(MOTOR_RR_ID, (throttle / 127) * .75);
+            xSemaphoreGive(actuator_mutex);
+        }
+    }
+
+    else if (steering < 0)
+    { // turn left
+        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
+        {
+            motor_go_backward(MOTOR_FL_ID, (abs(throttle) / 127) * .75);
+            motor_go_backward(MOTOR_RL_ID, (abs(throttle) / 127) * .75);
+            motor_go_forward(MOTOR_FR_ID, (abs(throttle) / 127) * .75);
+            motor_go_forward(MOTOR_RR_ID, (abs(throttle) / 127) * .75);
+            xSemaphoreGive(actuator_mutex);
+        }
+    }
+
     ESP_LOGI(TAG, "throttle: %d\tsteering:%d", throttle, steering);
 
     return 0;
