@@ -24,6 +24,9 @@ static encoder_ctxt_t enc_ctxt[4];
 
 static int forward_max_position, backward_max_position;
 
+int saved_pan_position = 0;
+int saved_tilt_position = 0;
+
 /*
 Pan encoder - Pin 30 | Dir - Pin 11
 Tilt encoder - Pin 28 | Dir - Pin 31
@@ -51,9 +54,6 @@ uint8_t overflow_counter_FL = 0;
 uint8_t overflow_counter_FR = 0;
 
 static QueueHandle_t encoder_queue = NULL;
-
-int saved_pan_position = 0;
-int saved_tilt_position = 0;
 
 int get_pulse_count(uint8_t encoder_id)
 {

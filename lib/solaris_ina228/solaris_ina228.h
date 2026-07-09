@@ -50,6 +50,10 @@ extern "C"
 #define INA228_REG_MANUFACTURER_ID 0x3E /**< Should return 0x5449 */
 #define INA228_REG_DEVICE_ID 0x3F       /**< Should return 0x2281 */
 
+#define SOLARIS_RING_BUFFER_SIZE 180 // every 1s read power from the energy monitor unit and store value in buffer
+
+    extern float solaris_power_buffer[SOLARIS_RING_BUFFER_SIZE];
+    extern int solaris_power_buffer_idx;
     // ---------------------------------------------------------------------------
     // Configuration struct
     // ---------------------------------------------------------------------------
@@ -97,13 +101,13 @@ extern "C"
  */
 #define SOLARIS_INA228_CONFIG_DEFAULT() { \
     .i2c_port = I2C_NUM_0,                \
-    .sda_io = 48,                         \
-    .scl_io = 47,                         \
+    .sda_io = 41,                         \
+    .scl_io = 40,                         \
     .clk_speed_hz = 400000,               \
     .timeout_ms = 1000,                   \
     .i2c_addr = 0x40,                     \
     .current_lsb = 1.0e-6f,               \
-    .shunt_cal = 788,                     \
+    .shunt_cal = 1049,                    \
     .config_reg = 0x0010,                 \
     .adc_config_reg = 0xFB6A,             \
     .battery_capacity_mah = 5000.0f,      \
@@ -136,6 +140,7 @@ extern "C"
         float charge_mah;    /**< Accumulated charge in milliamp-hours. */
         float temperature_c; /**< Die temperature in degrees Celsius. */
         float soc_percent;   /**< Estimated state of charge (0–100%). */
+        float v_shunt;
     } solaris_ina228_result_t;
 
     // ---------------------------------------------------------------------------
@@ -247,6 +252,9 @@ extern "C"
      * @return ESP_OK on success.
      */
     esp_err_t solaris_ina228_deinit(solaris_ina228_handle_t handle);
+
+    void solaris_ina228_1s_read(void *pvParmaters);
+    void solaris_ina228_make_move_decision(void *pvParameters);
 
 #ifdef __cplusplus
 }

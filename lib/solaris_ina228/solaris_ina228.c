@@ -12,6 +12,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include <quickselect.h>
+#include <solaris_weather.h>
+#include <time.h>
+#include "shared_resources.h"
+#include <motor_driver.h>
 
 static const char *TAG = "SOLARIS_INA228";
 
@@ -26,6 +31,9 @@ static const char *TAG = "SOLARIS_INA228";
 
 // RSTACC bit in CONFIG register — resets energy and charge accumulators
 #define INA228_CONFIG_RSTACC (1 << 14)
+
+int solaris_power_buffer_idx = 0;
+float solaris_power_buffer[SOLARIS_RING_BUFFER_SIZE];
 
 // ---------------------------------------------------------------------------
 // Internal context
@@ -46,19 +54,24 @@ static esp_err_t prv_write_reg16(const struct solaris_ina228_ctx_t *ctx,
                                  uint8_t reg, uint16_t data)
 {
     uint8_t buf[3] = {reg, (data >> 8) & 0xFF, data & 0xFF};
-    return i2c_master_write_to_device(ctx->cfg.i2c_port, ctx->cfg.i2c_addr,
-                                      buf, 3,
-                                      pdMS_TO_TICKS(ctx->cfg.timeout_ms));
+    xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
+    esp_err_t err = i2c_master_write_to_device(ctx->cfg.i2c_port, ctx->cfg.i2c_addr,
+                                               buf, 3,
+                                               pdMS_TO_TICKS(ctx->cfg.timeout_ms));
+    xSemaphoreGive(i2c_bus_mutex);
+    return err;
 }
 
 static esp_err_t prv_read_reg16(const struct solaris_ina228_ctx_t *ctx,
                                 uint8_t reg, uint16_t *out)
 {
     uint8_t buf[2];
+    xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
     esp_err_t err = i2c_master_write_read_device(ctx->cfg.i2c_port,
                                                  ctx->cfg.i2c_addr,
                                                  &reg, 1, buf, 2,
                                                  pdMS_TO_TICKS(ctx->cfg.timeout_ms));
+    xSemaphoreGive(i2c_bus_mutex);
     if (err == ESP_OK)
     {
         *out = ((uint16_t)buf[0] << 8) | buf[1];
@@ -70,10 +83,12 @@ static esp_err_t prv_read_reg24(const struct solaris_ina228_ctx_t *ctx,
                                 uint8_t reg, uint32_t *out)
 {
     uint8_t buf[3];
+    xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
     esp_err_t err = i2c_master_write_read_device(ctx->cfg.i2c_port,
                                                  ctx->cfg.i2c_addr,
                                                  &reg, 1, buf, 3,
                                                  pdMS_TO_TICKS(ctx->cfg.timeout_ms));
+    xSemaphoreGive(i2c_bus_mutex);
     if (err == ESP_OK)
     {
         *out = ((uint32_t)buf[0] << 16) | ((uint32_t)buf[1] << 8) | buf[2];
@@ -85,10 +100,12 @@ static esp_err_t prv_read_reg40(const struct solaris_ina228_ctx_t *ctx,
                                 uint8_t reg, uint64_t *out)
 {
     uint8_t buf[5];
+    xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
     esp_err_t err = i2c_master_write_read_device(ctx->cfg.i2c_port,
                                                  ctx->cfg.i2c_addr,
                                                  &reg, 1, buf, 5,
                                                  pdMS_TO_TICKS(ctx->cfg.timeout_ms));
+    xSemaphoreGive(i2c_bus_mutex);
     if (err == ESP_OK)
     {
         *out = ((uint64_t)buf[0] << 32) |
@@ -297,6 +314,18 @@ esp_err_t solaris_ina228_read(solaris_ina228_handle_t handle,
         return err;
     result->voltage_v = (float)(raw_vbus >> 4) * INA228_VBUS_LSB_V;
 
+    // V-SHUNT
+    uint32_t raw_vshunt = 0;
+    err = prv_read_reg24(handle, INA228_REG_VSHUNT, &raw_vshunt);
+    if (err != ESP_OK)
+        return err;
+    int32_t shunt_counts = (int32_t)(raw_vshunt >> 4);
+    if (shunt_counts & 0x80000)
+    {                             // bit 19 set => negative
+        shunt_counts -= 0x100000; // subtract 2^20 to sign-extend
+    }
+    result->v_shunt = (float)(raw_vbus >> 4) * INA228_VBUS_LSB_V;
+
     // CURRENT
     uint32_t raw_curr = 0;
     err = prv_read_reg24(handle, INA228_REG_CURRENT, &raw_curr);
@@ -383,14 +412,15 @@ void solaris_ina228_log(solaris_ina228_handle_t handle,
         return;
 
     ESP_LOGI(TAG, "V: %6.3fV | I: %8.4fA (%7.2fmA) | P: %6.4fW | "
-                  "SOC: %5.1f%% | Temp: %.1f°C | Charge: %.2fmAh | Energy: %.4fJ",
+                  "SOC: %5.1f%% | Temp: %.1f°C | Charge: %.2fmAh | Energy: %.4fJ | V Shunt: %.2f",
              result->voltage_v,
              result->current_a, result->current_ma,
              result->power_w,
              result->soc_percent,
              result->temperature_c,
              result->charge_mah,
-             result->energy_j);
+             result->energy_j,
+             result->v_shunt);
 }
 
 // ---------------------------------------------------------------------------
@@ -420,4 +450,85 @@ esp_err_t solaris_ina228_deinit(solaris_ina228_handle_t handle)
     free(handle);
     ESP_LOGI(TAG, "Deinitialised");
     return ESP_OK;
+}
+
+void solaris_ina228_make_move_decision(void *pvParameters)
+{
+    float median_last_30s;
+    float median_last_3m;
+    solaris_weather_t weather;
+    uint32_t now;
+    uint32_t bits;
+    while (1)
+    {
+        xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY);
+        solaris_weather_get(&weather);
+        now = (uint32_t)time(NULL);
+        // If its an hour after sunruse or before, don't bother moving
+        if (now - 3600 < weather.sunrise)
+        {
+            ;
+        }
+        // if its an hour before sunset or after, dont bother moving
+        else if (now + 3600 > weather.sunset)
+        {
+            ;
+        }
+        else
+        {
+            xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
+            median_last_30s = solaris_windowed_median(solaris_power_buffer, SOLARIS_RING_BUFFER_SIZE, solaris_power_buffer_idx, 30);
+            median_last_3m = solaris_windowed_median(solaris_power_buffer, SOLARIS_RING_BUFFER_SIZE, solaris_power_buffer_idx, SOLARIS_RING_BUFFER_SIZE);
+            xSemaphoreGive(solaris_energy_monitor_resource);
+            // If the last 30 seconds has seen a 5% drop it is likely shade / clouds over the panel.
+            // Determine if cloud percentage is low and then move the robot if that's the case
+            if (median_last_30s * 1.05 < median_last_3m)
+            {
+
+                const solaris_forecast_entry_t *forecast_now = solaris_weather_get_forecast_at(&weather, now);
+                uint8_t cloud_cover_pct = forecast_now ? forecast_now->cloud_cover_pct : 0;
+                // If cloud coverage percentage is high either don't move at all, or add extra logic on if you should move
+                if (cloud_cover_pct > CLOUD_COVERAGE_PERCENTAGE_DECISION)
+                {
+                    ;
+                }
+                else
+                {
+                    // Send notification to move
+                    memcpy(&bits, &median_last_3m, sizeof(bits));
+                    xTaskNotify(xDriverFunction, bits, eSetValueWithOverwrite);
+                }
+            }
+        }
+    }
+}
+
+void solaris_ina228_1s_read(void *pvParmaters)
+{
+    solaris_ina228_handle_t handle = (solaris_ina228_handle_t)pvParmaters;
+    solaris_ina228_result_t result;
+    int counter = 0;
+    while (1)
+    {
+        // don't keep track unless the robot isn't moving currently Also grab the mutex for writing to the shared buffer
+        xSemaphoreTake(actuator_mutex, portMAX_DELAY);
+        xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
+        // Read the energy units power and store the result in the ring buffer
+        solaris_ina228_read(handle, &result);
+        solaris_power_buffer[solaris_power_buffer_idx] = result.power_w;
+        solaris_power_buffer_idx = (solaris_power_buffer_idx + 1) % 180;
+
+        // give back mutexes
+        xSemaphoreGive(solaris_energy_monitor_resource);
+        xSemaphoreGive(actuator_mutex);
+
+        counter++;
+        if (counter == SOLARIS_RING_BUFFER_SIZE)
+        {
+            // after 3 minutes of information is filled, notify move decision task to fire
+            counter = 0;
+            xTaskNotifyGive(xMoveDecision);
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }

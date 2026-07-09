@@ -8,6 +8,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "shared_resources.h"
 
 static const char *TAG = "SOLARIS_IMU";
 
@@ -41,11 +42,17 @@ struct solaris_icm_ctx_t {
 
 static esp_err_t prv_write_register(const struct solaris_icm_ctx_t *ctx, uint8_t dev_addr, uint8_t reg, uint8_t data) {
     uint8_t write_buf[2] = {reg, data};
-    return i2c_master_write_to_device(ctx->cfg.i2c_port, dev_addr, write_buf, sizeof(write_buf), pdMS_TO_TICKS(100));
+    xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
+    esp_err_t err = i2c_master_write_to_device(ctx->cfg.i2c_port, dev_addr, write_buf, sizeof(write_buf), pdMS_TO_TICKS(100));
+    xSemaphoreGive(i2c_bus_mutex);
+    return err;
 }
 
 static esp_err_t prv_read_registers(const struct solaris_icm_ctx_t *ctx, uint8_t dev_addr, uint8_t reg, uint8_t *data, size_t len) {
-    return i2c_master_write_read_device(ctx->cfg.i2c_port, dev_addr, &reg, 1, data, len, pdMS_TO_TICKS(100));
+    xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
+    esp_err_t err = i2c_master_write_read_device(ctx->cfg.i2c_port, dev_addr, &reg, 1, data, len, pdMS_TO_TICKS(100));
+    xSemaphoreGive(i2c_bus_mutex);
+    return err;
 }
 
 // ---------------------------------------------------------------------------

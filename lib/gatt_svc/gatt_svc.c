@@ -355,8 +355,9 @@ static int handle_mode_write(struct ble_gatt_access_ctxt *ctxt)
     uint8_t requested_mode = ctxt->om->om_data[0];
     if (!solaris_mode_set_from_u8(requested_mode))
         return BLE_ATT_ERR_UNLIKELY;
-    solaris_mode_t mode = solaris_mode_get();
-    if (xQueueSend(xModeQueue, (void *)&mode, (TickType_t)(10)) != pdPASS)
+
+    solaris_event_t evt = {.type = SOLARIS_EVENT_MODE_CHANGE, .mode = (uint8_t)solaris_mode_get()};
+    if (xQueueSend(xEventQueue, &evt, (TickType_t)(10)) != pdPASS)
     {
         ESP_LOGE(TAG, "Queue was unable to send");
     }
@@ -410,6 +411,12 @@ static int handle_weather_write(struct ble_gatt_access_ctxt *ctxt)
     return 0;
 }
 
+// Tracks whether *this* handler currently owns actuator_mutex on behalf of
+// the drive motors. GATT write callbacks all run on the NimBLE host task, so
+// it's safe for the mutex to be taken on one call and given back on a later
+// one — ownership is per-task, not per-invocation.
+static bool s_drive_mutex_held = false;
+
 static int handle_manual_ctrl_write(struct ble_gatt_access_ctxt *ctxt)
 {
     if (ctxt->om->om_len != 2)
@@ -426,60 +433,59 @@ static int handle_manual_ctrl_write(struct ble_gatt_access_ctxt *ctxt)
     // If both throttle and steering commands are 0, stop moving all drive motors
     if (throttle == 0 && steering == 0)
     {
-        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
+        if (s_drive_mutex_held)
         {
             stop_motor(MOTOR_FL_ID);
             stop_motor(MOTOR_FR_ID);
             stop_motor(MOTOR_RL_ID);
             stop_motor(MOTOR_RR_ID);
             xSemaphoreGive(actuator_mutex);
+            s_drive_mutex_held = false;
         }
+        ESP_LOGI(TAG, "throttle: %d\tsteering:%d", throttle, steering);
+        return 0;
     }
-    else if (throttle > 0)
+
+    // Non-stop command: acquire the mutex once, on the transition into
+    // motion. While already driving we just keep updating speed/direction
+    // on the lock we already hold.
+    if (!s_drive_mutex_held)
+    {
+        if (xSemaphoreTake(actuator_mutex, 0) != pdTRUE)
+        {
+            ESP_LOGW(TAG, "actuator busy (panel moving), ignoring drive command");
+            return 0;
+        }
+        s_drive_mutex_held = true;
+    }
+
+    if (throttle > 0 && s_drive_mutex_held)
     { // move forward
-        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
-        {
-            motor_go_forward(MOTOR_FL_ID, (throttle / 127) * .75);
-            motor_go_forward(MOTOR_FR_ID, (throttle / 127) * .75);
-            motor_go_forward(MOTOR_RL_ID, (throttle / 127) * .75);
-            motor_go_forward(MOTOR_RR_ID, (throttle / 127) * .75);
-            xSemaphoreGive(actuator_mutex);
-        }
+        motor_go_forward(MOTOR_FL_ID, ((float)throttle / 127.0) * .75);
+        motor_go_forward(MOTOR_RL_ID, ((float)throttle / 127.0) * .75);
+        motor_go_backward(MOTOR_FR_ID, ((float)throttle / 127.0) * .75);
+        motor_go_backward(MOTOR_RR_ID, ((float)throttle / 127.0) * .75);
     }
-    else if (throttle < 0)
+    else if (throttle < 0 && s_drive_mutex_held)
     { // move backward
-        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
-        {
-            motor_go_backward(MOTOR_FL_ID, (abs(throttle) / 127) * .75);
-            motor_go_backward(MOTOR_FR_ID, (abs(throttle) / 127) * .75);
-            motor_go_backward(MOTOR_RL_ID, (abs(throttle) / 127) * .75);
-            motor_go_backward(MOTOR_RR_ID, (abs(throttle) / 127) * .75);
-            xSemaphoreGive(actuator_mutex);
-        }
+        motor_go_backward(MOTOR_FL_ID, ((float)abs(throttle) / 127.0) * .75);
+        motor_go_backward(MOTOR_RL_ID, ((float)abs(throttle) / 127.0) * .75);
+        motor_go_forward(MOTOR_FR_ID, ((float)abs(throttle) / 127.0) * .75);
+        motor_go_forward(MOTOR_RR_ID, ((float)abs(throttle) / 127) * .75);
     }
-
-    else if (steering > 0)
+    else if (steering > 0 && s_drive_mutex_held)
     { // turn right
-        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
-        {
-            motor_go_forward(MOTOR_FL_ID, (throttle / 127) * .75);
-            motor_go_forward(MOTOR_RL_ID, (throttle / 127) * .75);
-            motor_go_backward(MOTOR_FR_ID, (throttle / 127) * .75);
-            motor_go_backward(MOTOR_RR_ID, (throttle / 127) * .75);
-            xSemaphoreGive(actuator_mutex);
-        }
+        motor_go_forward(MOTOR_FL_ID, ((float)steering / 127.0) * .75);
+        motor_go_forward(MOTOR_RL_ID, ((float)steering / 127.0) * .75);
+        motor_go_forward(MOTOR_FR_ID, ((float)steering / 127.0) * .75);
+        motor_go_forward(MOTOR_RR_ID, ((float)steering / 127.0) * .75);
     }
-
-    else if (steering < 0)
+    else if (steering < 0 && s_drive_mutex_held)
     { // turn left
-        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
-        {
-            motor_go_backward(MOTOR_FL_ID, (abs(throttle) / 127) * .75);
-            motor_go_backward(MOTOR_RL_ID, (abs(throttle) / 127) * .75);
-            motor_go_forward(MOTOR_FR_ID, (abs(throttle) / 127) * .75);
-            motor_go_forward(MOTOR_RR_ID, (abs(throttle) / 127) * .75);
-            xSemaphoreGive(actuator_mutex);
-        }
+        motor_go_backward(MOTOR_FL_ID, ((float)abs(steering) / 127.0) * .75);
+        motor_go_backward(MOTOR_RL_ID, ((float)abs(steering) / 127.0) * .75);
+        motor_go_backward(MOTOR_FR_ID, ((float)abs(steering) / 127.0) * .75);
+        motor_go_backward(MOTOR_RR_ID, ((float)abs(steering) / 127.0) * .75);
     }
 
     ESP_LOGI(TAG, "throttle: %d\tsteering:%d", throttle, steering);

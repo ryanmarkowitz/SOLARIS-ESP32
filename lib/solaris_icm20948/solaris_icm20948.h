@@ -130,6 +130,9 @@ void solaris_icm20948_log(const solaris_icm20948_result_t *result);
  */
 esp_err_t solaris_icm20948_deinit(solaris_icm20948_handle_t handle);
 
+extern solaris_icm20948_config_t imu_cfg;
+extern solaris_icm20948_handle_t imu_handle;
+
 #ifdef __cplusplus
 }
 #endif

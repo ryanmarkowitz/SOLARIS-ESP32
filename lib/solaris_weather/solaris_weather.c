@@ -40,3 +40,21 @@ void solaris_weather_get(solaris_weather_t *weather_out)
     if (weather_out)
         *weather_out = g_weather;
 }
+
+const solaris_forecast_entry_t *solaris_weather_get_forecast_at(const solaris_weather_t *weather, uint32_t timestamp)
+{
+    const solaris_forecast_entry_t *closest = NULL;
+    uint32_t best_diff = UINT32_MAX;
+
+    for (int i = 0; i < SOLARIS_WEATHER_FORECAST_HOURS; i++)
+    {
+        uint32_t t = weather->forecast[i].time;
+        uint32_t diff = (t > timestamp) ? (t - timestamp) : (timestamp - t);
+        if (diff < best_diff)
+        {
+            best_diff = diff;
+            closest = &weather->forecast[i];
+        }
+    }
+    return closest;
+}

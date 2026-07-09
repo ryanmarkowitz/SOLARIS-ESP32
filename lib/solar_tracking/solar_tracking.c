@@ -207,22 +207,22 @@ esp_err_t solaris_pt_read(solaris_pt_handle_t handle, solaris_pt_result_t *resul
     if (!handle || !results)
         return ESP_ERR_INVALID_ARG;
 
+    // solar_tracking and driver_function both call this on the same mux-select
+    // GPIOs + ADC channel -- without this, one task's mux_select can flip the
+    // channel out from under the other task's pending ADC read.
+    xSemaphoreTake(pt_bus_mutex, portMAX_DELAY);
+
+    esp_err_t err = ESP_OK;
     for (int i = 0; i < SOLARIS_PT_MAX_SENSORS / 2; i++)
     {
-        if (is_tilt_panel_sensors)
-        {
-            esp_err_t err = solaris_pt_read_single(handle, i, &results[i]);
-            if (err != ESP_OK)
-                return err;
-        }
-        else
-        {
-            esp_err_t err = solaris_pt_read_single(handle, i + 4, &results[i]);
-            if (err != ESP_OK)
-                return err;
-        }
+        int index = is_tilt_panel_sensors ? i : i + 4;
+        err = solaris_pt_read_single(handle, index, &results[i]);
+        if (err != ESP_OK)
+            break;
     }
-    return ESP_OK;
+
+    xSemaphoreGive(pt_bus_mutex);
+    return err;
 }
 
 void solaris_pt_log(solaris_pt_handle_t handle, const solaris_pt_result_t *results)
@@ -261,30 +261,104 @@ void solar_tracking(void *pvParameters)
     int left_right = 0,
         top_down = 0;
 
+    int pulse_count;
+
+    int tilt_pulse;
+    int pan_pulse;
+
+    bool panel_set = false;
+    bool left_right_settled = false;
+    bool up_down_settled = false;
+
     stop_motor(0);
     stop_motor(1);
 
     while (1)
     {
+        xTaskNotifyStateClear(NULL);
         xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY);
-        // If drive motors are not currently moving, try to move the panels
-        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
+        panel_set = false;
+        left_right_settled = false;
+        up_down_settled = false;
+
+        // Take the mutex once, blocking here until the drive motors give it
+        // up. It's held for the entire adjustment pass below and only given
+        // back once panel_set becomes true. A (non-recursive) mutex can't be
+        // re-taken by the same task that already holds it, so this must
+        // happen once here, not on every loop iteration below.
+        xSemaphoreTake(actuator_mutex, portMAX_DELAY);
+        ESP_LOGI(TAG, "Got The semaphore");
+
+        while (!panel_set)
         {
-            ESP_LOGI(TAG, "Got The semaphore");
+            vTaskDelay(pdMS_TO_TICKS(250));
+
             solaris_pt_read(pt, result, true);
             // LEFT RIGHT CHECK
             left_right = (result[0].mv + result[2].mv) - (result[1].mv + result[3].mv);
             ESP_LOGI(TAG, "left_right value: %d", left_right);
             if (left_right > VOLTAGE_TOLERANCE)
             { // The panel needs to rotate left
-                motor_go_forward(PANEL_PAN_ID, .15);
+                pulse_count = get_pulse_count(PANEL_TILT_ID);
+                if (pulse_count + saved_tilt_position >= 0)
+                {
+                    // If panel can't move right anymore, mark left_right_settled boolean as true
+                    if (panel_get_limit_state(PANEL_PAN_ID) == PANEL_AT_UPPER_LIMIT)
+                    {
+                        stop_motor(PANEL_PAN_ID);
+                        left_right_settled = true;
+                    }
+                    else
+                    {
+
+                        motor_go_forward(PANEL_PAN_ID, .15);
+                    }
+                }
+                else
+                {
+                    if (panel_get_limit_state(PANEL_PAN_ID) == PANEL_AT_LOWER_LIMIT)
+                    {
+                        stop_motor(PANEL_PAN_ID);
+                        left_right_settled = true;
+                    }
+                    else
+                    {
+
+                        motor_go_backward(PANEL_PAN_ID, .15);
+                    }
+                }
             }
             else if (abs(left_right) > VOLTAGE_TOLERANCE)
             { // The panel needs to rotate right
-                motor_go_backward(PANEL_PAN_ID, .15);
+                pulse_count = get_pulse_count(PANEL_TILT_ID);
+                if (pulse_count + saved_tilt_position >= 0)
+                {
+                    if (panel_get_limit_state(PANEL_PAN_ID) == PANEL_AT_LOWER_LIMIT)
+                    {
+                        stop_motor(PANEL_PAN_ID);
+                        left_right_settled = true;
+                    }
+                    else
+                    {
+                        motor_go_backward(PANEL_PAN_ID, .15);
+                    }
+                }
+                else
+                {
+                    if (panel_get_limit_state(PANEL_PAN_ID) == PANEL_AT_UPPER_LIMIT)
+                    {
+                        stop_motor(PANEL_PAN_ID);
+                        left_right_settled = true;
+                    }
+                    else
+                    {
+                        motor_go_forward(PANEL_PAN_ID, .15);
+                    }
+                }
             }
             else
             { // Found correct spot stop panning the motor
+                left_right_settled = true;
                 stop_motor(PANEL_PAN_ID);
             }
 
@@ -293,27 +367,50 @@ void solar_tracking(void *pvParameters)
             ESP_LOGI(TAG, "top_down value %d", top_down);
             if (top_down > VOLTAGE_TOLERANCE)
             { // The panel needs to pan up
-                motor_go_forward(PANEL_TILT_ID, .15);
+                if (panel_get_limit_state(PANEL_TILT_ID) == PANEL_AT_UPPER_LIMIT)
+                {
+                    stop_motor(PANEL_TILT_ID);
+                    up_down_settled = true;
+                }
+                else
+                {
+                    motor_go_forward(PANEL_TILT_ID, .15);
+                }
             }
             else if (abs(top_down) > VOLTAGE_TOLERANCE)
             { // The panel needs to pan down
-                motor_go_backward(PANEL_TILT_ID, .15);
+                if (panel_get_limit_state(PANEL_TILT_ID) == PANEL_AT_LOWER_LIMIT)
+                {
+                    stop_motor(PANEL_TILT_ID);
+                    up_down_settled = true;
+                }
+                else
+                {
+                    motor_go_backward(PANEL_TILT_ID, .15);
+                }
             }
             else
             { // Found correct spot stop panning the motor
+                up_down_settled = true;
                 stop_motor(PANEL_TILT_ID);
             }
-            xSemaphoreGive(actuator_mutex);
+
+            if (up_down_settled == true && left_right_settled == true)
+            {
+                panel_set = true;
+            }
+
+            // Only release the mutex once the panel has actually settled.
+            if (panel_set)
+            {
+                xSemaphoreGive(actuator_mutex);
+                ESP_LOGI(TAG, "Released the semaphore");
+            }
+
+            tilt_pulse = get_pulse_count(TILT_ENCODER_ID);
+            pan_pulse = get_pulse_count(PAN_ENCODER_ID);
+            ESP_LOGI(TAG, "pulse encoder val: %d", pan_pulse);
+            ESP_LOGI(TAG, "tilt encoder val: %d", tilt_pulse);
         }
-        else
-        {
-            ESP_LOGI(TAG, "Unable to get semaphore");
-        }
-        int tilt_pulse;
-        int pan_pulse;
-        tilt_pulse = get_pulse_count(TILT_ENCODER_ID);
-        pan_pulse = get_pulse_count(PAN_ENCODER_ID);
-        ESP_LOGI(TAG, "pulse encoder val: %d", pan_pulse);
-        ESP_LOGI(TAG, "tilt encoder val: %d", tilt_pulse);
     }
 }

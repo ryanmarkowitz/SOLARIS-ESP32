@@ -1,16 +1,23 @@
 #include "motor_driver.h"
 #include "esp_log.h"
 #include <stdint.h>
+#include <math.h>
 #include <encoders.h>
+#include <solaris_icm20948.h>
 #include "driver/mcpwm_timer.h"
 #include "driver/mcpwm_prelude.h"
 #include "driver/mcpwm_gen.h"
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #define PWM_PERIOD_TICKS 50
 
 #define TAG "MOTOR_DRIVER_SERVICE"
+
+#define MOTOR_TURN_DUTY 0.5f
+#define MOTOR_TURN_LOOP_MS 20
+#define MOTOR_TURN_TIMEOUT_MS 10000
 
 // Asssign pin outs for each motor
 /*
@@ -157,6 +164,63 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
         stop_motor(motor_id);
         ESP_LOGI(TAG, "Trying to move panel backward but lower limit is reached for motor #%d", motor_id);
     }
+}
+
+void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees)
+{
+    if (!imu || degrees == 0.0f)
+        return;
+
+    bool turn_right = degrees > 0.0f;
+    float target_deg = fabsf(degrees);
+    if (target_deg > 360.0f)
+        target_deg = 360.0f;
+
+    if (turn_right)
+    { // all motors backward -> turn right on this chassis
+        motor_go_backward(MOTOR_FL_ID, MOTOR_TURN_DUTY);
+        motor_go_backward(MOTOR_RL_ID, MOTOR_TURN_DUTY);
+        motor_go_backward(MOTOR_FR_ID, MOTOR_TURN_DUTY);
+        motor_go_backward(MOTOR_RR_ID, MOTOR_TURN_DUTY);
+    }
+    else
+    { // all motors forward -> turn left on this chassis
+        motor_go_forward(MOTOR_FL_ID, MOTOR_TURN_DUTY);
+        motor_go_forward(MOTOR_RL_ID, MOTOR_TURN_DUTY);
+        motor_go_forward(MOTOR_FR_ID, MOTOR_TURN_DUTY);
+        motor_go_forward(MOTOR_RR_ID, MOTOR_TURN_DUTY);
+    }
+
+    float turned_deg = 0.0f;
+    TickType_t last_tick = xTaskGetTickCount();
+    TickType_t start_tick = last_tick;
+    solaris_icm20948_result_t sample;
+
+    while (turned_deg < target_deg)
+    {
+        vTaskDelay(pdMS_TO_TICKS(MOTOR_TURN_LOOP_MS));
+
+        TickType_t now_tick = xTaskGetTickCount();
+        float dt_s = (float)(now_tick - last_tick) * portTICK_PERIOD_MS / 1000.0f;
+        last_tick = now_tick;
+
+        if (solaris_icm20948_read(imu, &sample) == ESP_OK)
+        {
+            float gyro_dps = (float)sample.gyro_z / IMU_GYRO_SENS_LSB_PER_DPS;
+            turned_deg += fabsf(gyro_dps) * dt_s;
+        }
+
+        if ((now_tick - start_tick) * portTICK_PERIOD_MS > MOTOR_TURN_TIMEOUT_MS)
+        {
+            ESP_LOGW(TAG, "motor_turn_degrees timed out at %.1f/%.1f deg", turned_deg, target_deg);
+            break;
+        }
+    }
+
+    stop_motor(MOTOR_FL_ID);
+    stop_motor(MOTOR_FR_ID);
+    stop_motor(MOTOR_RL_ID);
+    stop_motor(MOTOR_RR_ID);
 }
 
 void test_motor(void *pvParameters)

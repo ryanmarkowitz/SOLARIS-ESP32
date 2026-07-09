@@ -210,6 +210,9 @@ void solaris_us_print_teleplot(solaris_us_handle_t        handle,
  */
 esp_err_t solaris_us_deinit(solaris_us_handle_t handle);
 
+extern solaris_us_config_t us_cfg;
+extern solaris_us_handle_t us_handle;
+
 #ifdef __cplusplus
 }
 #endif

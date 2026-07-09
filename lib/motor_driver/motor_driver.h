@@ -3,6 +3,14 @@
 #include "driver/mcpwm_oper.h"
 #include "driver/mcpwm_cmpr.h"
 
+// Forward-declared rather than including solaris_icm20948.h here: that
+// header pulls in the IMU library, and since motor_driver.h is included
+// by unrelated libs (e.g. encoders), a full include leaks the dependency
+// to consumers that don't need it and confuses PlatformIO's LDF. This is
+// the same opaque-pointer type from solaris_icm20948.h — the underlying
+// struct is never defined in any header, only in solaris_icm20948.c.
+typedef struct solaris_icm_ctx_t *solaris_icm20948_handle_t;
+
 #define NUM_MOTORS 6
 #define PANEL_PAN_ID 0
 #define PANEL_TILT_ID 1
@@ -12,6 +20,11 @@
 #define MOTOR_FR_ID 3
 #define MOTOR_RL_ID 4
 #define MOTOR_RR_ID 5
+
+// ICM-20948 default gyro full-scale is +/-250 dps -> 131 LSB per dps.
+// If GYRO_CONFIG_1 in solaris_icm20948.c is ever changed to a wider FS
+// range, this must be updated to match.
+#define IMU_GYRO_SENS_LSB_PER_DPS 131.0f
 
 /* Structs and enums */
 typedef struct
@@ -44,5 +57,14 @@ void motor_init();
 void motor_go_forward(uint8_t panel_id, float duty_cycle);
 void motor_go_backward(uint8_t panel_id, float duty_cycle);
 void test_motor(void *pvParameters);
+
+/*
+ * Rotates SOLARIS in place using the IMU gyro to track how far it has
+ * turned. Positive degrees turns right (clockwise, all 4 drive motors
+ * backward on this chassis); negative turns left (all 4 forward). Range
+ * is clamped to [-360, 360]. Blocks the calling task until the turn
+ * completes (or times out). Caller must already hold actuator_mutex.
+ */
+void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees);
 
 #endif

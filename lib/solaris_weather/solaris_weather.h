@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #define SOLARIS_WEATHER_FORECAST_HOURS 24
+#define CLOUD_COVERAGE_PERCENTAGE_DECISION 80
 
 /*
  * BLE write payload layout (152 bytes, all little-endian):
@@ -36,5 +37,12 @@ typedef struct
 
 bool solaris_weather_set_from_ble(const uint8_t *data, uint16_t len);
 void solaris_weather_get(solaris_weather_t *weather_out);
+
+/*
+ * Returns the forecast entry whose `time` is closest to `timestamp`
+ * (both are unix epoch seconds, matching time(NULL)). Returns NULL if
+ * `weather` has no forecast entries.
+ */
+const solaris_forecast_entry_t *solaris_weather_get_forecast_at(const solaris_weather_t *weather, uint32_t timestamp);
 
 #endif // SOLARIS_WEATHER_H
