@@ -23,24 +23,20 @@
 /*
 MOTOR 0 - PAN MOTOR
 MOTOR 1 - TILT MOTOR
-MOTOR 2 - FRONT LEFT MOTOR
-MOTOR 3 - FRONT RIGHT MOTOR
-MOTOR 4 - REAR LEFT MOTOR
-MOTOR 5 - REAR RIGHT MOTOR
+MOTOR 2 - LEFT DRIVE MOTOR
+MOTOR 3 - RIGHT DRIVE MOTOR
 */
 static const motor_pins_t motor_pins[NUM_MOTORS] = {
     {.pwm_gpio = 17, .dir_gpio = 18},
     {.pwm_gpio = 21, .dir_gpio = 38},
-    {.pwm_gpio = 4, .dir_gpio = 7},
-    {.pwm_gpio = 6, .dir_gpio = 9},
-    {.pwm_gpio = 8, .dir_gpio = 7},
-    {.pwm_gpio = 15, .dir_gpio = 9}};
+    {.pwm_gpio = 4, .dir_gpio = 42},
+    {.pwm_gpio = 6, .dir_gpio = 9}};
 
 static motor_t motors[NUM_MOTORS];
 
 // The motors will share one timer, and each operator will be assigned to two motors
 static mcpwm_timer_handle_t shared_timer = NULL;
-static mcpwm_oper_handle_t shared_operators[3] = {NULL, NULL, NULL};
+static mcpwm_oper_handle_t shared_operators[2] = {NULL, NULL};
 
 // Track if panning of solar panel is at its maximum degree
 static volatile panel_limit_state_t s_state[2] = {PANEL_OK, PANEL_OK};
@@ -67,8 +63,8 @@ void motor_init(void)
     };
     mcpwm_new_timer(&timer_config, &shared_timer);
 
-    // Three Operators tied to the shared timer
-    for (int i = 0; i < 3; i++)
+    // Two Operators tied to the shared timer
+    for (int i = 0; i < 2; i++)
     {
         mcpwm_operator_config_t oper_config = {.group_id = 0};
         mcpwm_new_operator(&oper_config, &shared_operators[i]);
@@ -77,9 +73,8 @@ void motor_init(void)
 
     // Each motor gets its own generator and its own comparator.
     // However an operator is tied to 2 motors
-    // Motors 0-1 tied to operator 0
-    // Motors 2-3 tied to operator 1
-    // Motors 4-5 tied to operator 2
+    // Motors 0-1 (pan/tilt) tied to operator 0
+    // Motors 2-3 (left/right drive) tied to operator 1
     for (int i = 0; i < NUM_MOTORS; i++)
     {
         const motor_pins_t *pins = &motor_pins[i];
@@ -177,18 +172,14 @@ void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees)
         target_deg = 360.0f;
 
     if (turn_right)
-    { // all motors backward -> turn right on this chassis
-        motor_go_backward(MOTOR_FL_ID, MOTOR_TURN_DUTY);
-        motor_go_backward(MOTOR_RL_ID, MOTOR_TURN_DUTY);
-        motor_go_backward(MOTOR_FR_ID, MOTOR_TURN_DUTY);
-        motor_go_backward(MOTOR_RR_ID, MOTOR_TURN_DUTY);
+    { // both motors backward -> turn right on this chassis
+        motor_go_backward(MOTOR_LEFT_ID, MOTOR_TURN_DUTY);
+        motor_go_backward(MOTOR_RIGHT_ID, MOTOR_TURN_DUTY);
     }
     else
-    { // all motors forward -> turn left on this chassis
-        motor_go_forward(MOTOR_FL_ID, MOTOR_TURN_DUTY);
-        motor_go_forward(MOTOR_RL_ID, MOTOR_TURN_DUTY);
-        motor_go_forward(MOTOR_FR_ID, MOTOR_TURN_DUTY);
-        motor_go_forward(MOTOR_RR_ID, MOTOR_TURN_DUTY);
+    { // both motors forward -> turn left on this chassis
+        motor_go_forward(MOTOR_LEFT_ID, MOTOR_TURN_DUTY);
+        motor_go_forward(MOTOR_RIGHT_ID, MOTOR_TURN_DUTY);
     }
 
     float turned_deg = 0.0f;
@@ -217,10 +208,8 @@ void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees)
         }
     }
 
-    stop_motor(MOTOR_FL_ID);
-    stop_motor(MOTOR_FR_ID);
-    stop_motor(MOTOR_RL_ID);
-    stop_motor(MOTOR_RR_ID);
+    stop_motor(MOTOR_LEFT_ID);
+    stop_motor(MOTOR_RIGHT_ID);
 }
 
 void test_motor(void *pvParameters)
@@ -229,26 +218,14 @@ void test_motor(void *pvParameters)
     while (1)
     {
 
-        stop_motor(1);
-        pulse_count = get_pulse_count(1);
-        ESP_LOGI(TAG, "Pulse Count of pan motor: %d", pulse_count);
-        motor_go_backward(1, .15);
-        vTaskDelay(pdMS_TO_TICKS(5000));
-
-        // vTaskDelay(pdMS_TO_TICKS(5000));
-        // stop_motor(0);
-        // pulse_count = get_pulse_count(0);
-        // ESP_LOGI(TAG, "Pulse Count of Pan motor: %d", pulse_count);
-        // motor_go_forward(1, .15);
-        // vTaskDelay(pdMS_TO_TICKS(5000));
-        // stop_motor(1);
-        // pulse_count = get_pulse_count(1);
-        // ESP_LOGI(TAG, "Pulse Count of Tilt motor: %d", pulse_count);
-        // motor_go_backward(0, .15);
-        // vTaskDelay(pdMS_TO_TICKS(5000));
-        // stop_motor(0);
-        // pulse_count = get_pulse_count(0);
-        // ESP_LOGI(TAG, "Pulse Count of Pan motor: %d", pulse_count);
-        // motor_go_backward(1, .15);
+        stop_motor(MOTOR_LEFT_ID);
+        stop_motor(MOTOR_RIGHT_ID);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        motor_go_forward(MOTOR_LEFT_ID, .75);
+        motor_go_forward(MOTOR_RIGHT_ID, .75);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        motor_go_backward(MOTOR_LEFT_ID, .75);
+        motor_go_backward(MOTOR_RIGHT_ID, .75);
+        vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }

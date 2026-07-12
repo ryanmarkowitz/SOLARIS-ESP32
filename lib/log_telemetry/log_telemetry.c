@@ -19,6 +19,7 @@ void log_telemetry(void *pvParameters)
     const TickType_t period = pdMS_TO_TICKS(60000);
     int32_t count = -1;
     solaris_telemetry_t record;
+    // TODO get a task signal to start after BLE gets initial connection
     while (1)
     {
 

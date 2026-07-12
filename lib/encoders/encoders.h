@@ -5,11 +5,10 @@
 #include "freertos/queue.h"
 #include "driver/pulse_cnt.h"
 
-#define NUM_ENCODERS 4
+#define NUM_ENCODERS 3
 #define PAN_ENCODER_ID 0
 #define TILT_ENCODER_ID 1
 #define FL_ENCODER_ID 2
-#define FR_ENCODER_ID 3
 
 /* Structs */
 typedef struct

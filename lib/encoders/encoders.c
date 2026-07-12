@@ -13,14 +13,13 @@
 
 #define LOW_LIMIT -32768
 #define HIGH_LIMIT 32767
-#define HIGH_LIMIT_FR 28387
 #define FORWARD_TARGET_PAN 2650   // maps to 360 degrees
 #define BACKWARD_TARGET_PAN -2650 // maps to -360 degrees
 #define FORWARD_TARGET_TILT 350   // maps to +30 degrees
 #define BACKWARD_TARGET_TILT -350 // maps to -30 degrees
 
 static int load_position_from_flash(uint8_t encoder_id);
-static encoder_ctxt_t enc_ctxt[4];
+static encoder_ctxt_t enc_ctxt[NUM_ENCODERS];
 
 static int forward_max_position, backward_max_position;
 
@@ -31,27 +30,24 @@ int saved_tilt_position = 0;
 Pan encoder - Pin 30 | Dir - Pin 11
 Tilt encoder - Pin 28 | Dir - Pin 31
 FL encoder - Pin 35
-FR encoder - Pin 26
 */
 
 static const encoder_pins_t encoder_pins[NUM_ENCODERS] = {
     {.encoder_gpio = 37, .dir_gpio = 18},
     {.encoder_gpio = 35, .dir_gpio = 38},
     {.encoder_gpio = 42, .dir_gpio = -1},
-    {.encoder_gpio = 45, .dir_gpio = -1}};
+};
 
 /*
 ENCODER 0 - PAN ENCODER
 ENCODER 1 - TILT ENCODER
-ENCODER 3 - FL ENCODER
-ENCODER 4 - FR ENCODER
+ENCODER 2 - FL ENCODER
 */
 static encoder_t encoders[NUM_ENCODERS];
 
 // used to track if driving motors overflowed and if so how many times
 // before moving is stopped.
 uint8_t overflow_counter_FL = 0;
-uint8_t overflow_counter_FR = 0;
 
 static QueueHandle_t encoder_queue = NULL;
 
@@ -126,9 +122,6 @@ static void encoder_handler(void *param)
             case FL_ENCODER_ID:
                 ESP_LOGI(TAG, "Overflow reached for FL encoder. At overflow #%d", ++overflow_counter_FL);
                 break;
-            case FR_ENCODER_ID:
-                ESP_LOGI(TAG, "Overflow reached for FR encoder. At overflow #%d", ++overflow_counter_FR);
-                break;
             }
         }
     }
@@ -142,10 +135,6 @@ void encoder_init()
         .low_limit = LOW_LIMIT,
     };
 
-    pcnt_unit_config_t unit_config2 = {
-        .high_limit = HIGH_LIMIT_FR,
-        .low_limit = LOW_LIMIT};
-
     pcnt_event_callbacks_t callbacks = {
         .on_reach = on_encoder_limit_reached,
     };
@@ -153,14 +142,11 @@ void encoder_init()
     // initialzie the queue size for an encoder event
     encoder_queue = xQueueCreate(16, sizeof(encoder_evt_t));
 
-    // configure most encoders to have the max high and low limit
-    for (int i = 0; i < NUM_ENCODERS - 1; i++)
+    // configure all encoders to have the max high and low limit
+    for (int i = 0; i < NUM_ENCODERS; i++)
     {
         ESP_ERROR_CHECK(pcnt_new_unit(&unit_config1, &encoders[i].pcnt_unit));
     }
-
-    // configure the FR max high limit to something different to avoid conflicting interrupts between FL encoder
-    ESP_ERROR_CHECK(pcnt_new_unit(&unit_config2, &encoders[FR_ENCODER_ID].pcnt_unit));
 
     for (int i = 0; i < NUM_ENCODERS; i++)
     {
@@ -354,14 +340,12 @@ int get_distance_traveled()
     ESP_ERROR_CHECK(pcnt_unit_get_count(encoders[TILT_ENCODER_ID].pcnt_unit, &cur_tilt_pulses));
     int sum = 0;
     sum += overflow_counter_FL * HIGH_LIMIT;
-    sum += overflow_counter_FR * HIGH_LIMIT_FR;
     sum += cur_pan_pulses;
     sum += cur_tilt_pulses;
     int avg = sum / 2;
 
     // set overflows back to 0 so we can calculate distnace traveled next time
     overflow_counter_FL = 0;
-    overflow_counter_FR = 0;
 
     // set counters in PCNT to 0 so we don't overcount in next call
     ESP_ERROR_CHECK(pcnt_unit_clear_count(encoders[PAN_ENCODER_ID].pcnt_unit));

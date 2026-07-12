@@ -11,15 +11,13 @@
 // struct is never defined in any header, only in solaris_icm20948.c.
 typedef struct solaris_icm_ctx_t *solaris_icm20948_handle_t;
 
-#define NUM_MOTORS 6
+#define NUM_MOTORS 4
 #define PANEL_PAN_ID 0
 #define PANEL_TILT_ID 1
 #define MOTOR_PAN_ID 0
 #define MOTOR_TILT_ID 1
-#define MOTOR_FL_ID 2
-#define MOTOR_FR_ID 3
-#define MOTOR_RL_ID 4
-#define MOTOR_RR_ID 5
+#define MOTOR_LEFT_ID 2
+#define MOTOR_RIGHT_ID 3
 
 // ICM-20948 default gyro full-scale is +/-250 dps -> 131 LSB per dps.
 // If GYRO_CONFIG_1 in solaris_icm20948.c is ever changed to a wider FS
@@ -60,8 +58,8 @@ void test_motor(void *pvParameters);
 
 /*
  * Rotates SOLARIS in place using the IMU gyro to track how far it has
- * turned. Positive degrees turns right (clockwise, all 4 drive motors
- * backward on this chassis); negative turns left (all 4 forward). Range
+ * turned. Positive degrees turns right (clockwise, both drive motors
+ * backward on this chassis); negative turns left (both forward). Range
  * is clamped to [-360, 360]. Blocks the calling task until the turn
  * completes (or times out). Caller must already hold actuator_mutex.
  */

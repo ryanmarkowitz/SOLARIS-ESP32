@@ -435,10 +435,8 @@ static int handle_manual_ctrl_write(struct ble_gatt_access_ctxt *ctxt)
     {
         if (s_drive_mutex_held)
         {
-            stop_motor(MOTOR_FL_ID);
-            stop_motor(MOTOR_FR_ID);
-            stop_motor(MOTOR_RL_ID);
-            stop_motor(MOTOR_RR_ID);
+            stop_motor(MOTOR_LEFT_ID);
+            stop_motor(MOTOR_RIGHT_ID);
             xSemaphoreGive(actuator_mutex);
             s_drive_mutex_held = false;
         }
@@ -461,31 +459,23 @@ static int handle_manual_ctrl_write(struct ble_gatt_access_ctxt *ctxt)
 
     if (throttle > 0 && s_drive_mutex_held)
     { // move forward
-        motor_go_forward(MOTOR_FL_ID, ((float)throttle / 127.0) * .75);
-        motor_go_forward(MOTOR_RL_ID, ((float)throttle / 127.0) * .75);
-        motor_go_backward(MOTOR_FR_ID, ((float)throttle / 127.0) * .75);
-        motor_go_backward(MOTOR_RR_ID, ((float)throttle / 127.0) * .75);
+        motor_go_forward(MOTOR_LEFT_ID, ((float)throttle / 127.0) * .75);
+        motor_go_backward(MOTOR_RIGHT_ID, ((float)throttle / 127.0) * .75);
     }
     else if (throttle < 0 && s_drive_mutex_held)
     { // move backward
-        motor_go_backward(MOTOR_FL_ID, ((float)abs(throttle) / 127.0) * .75);
-        motor_go_backward(MOTOR_RL_ID, ((float)abs(throttle) / 127.0) * .75);
-        motor_go_forward(MOTOR_FR_ID, ((float)abs(throttle) / 127.0) * .75);
-        motor_go_forward(MOTOR_RR_ID, ((float)abs(throttle) / 127) * .75);
+        motor_go_backward(MOTOR_LEFT_ID, ((float)abs(throttle) / 127.0) * .75);
+        motor_go_forward(MOTOR_RIGHT_ID, ((float)abs(throttle) / 127.0) * .75);
     }
     else if (steering > 0 && s_drive_mutex_held)
     { // turn right
-        motor_go_forward(MOTOR_FL_ID, ((float)steering / 127.0) * .75);
-        motor_go_forward(MOTOR_RL_ID, ((float)steering / 127.0) * .75);
-        motor_go_forward(MOTOR_FR_ID, ((float)steering / 127.0) * .75);
-        motor_go_forward(MOTOR_RR_ID, ((float)steering / 127.0) * .75);
+        motor_go_forward(MOTOR_LEFT_ID, ((float)steering / 127.0) * .75);
+        motor_go_forward(MOTOR_RIGHT_ID, ((float)steering / 127.0) * .75);
     }
     else if (steering < 0 && s_drive_mutex_held)
     { // turn left
-        motor_go_backward(MOTOR_FL_ID, ((float)abs(steering) / 127.0) * .75);
-        motor_go_backward(MOTOR_RL_ID, ((float)abs(steering) / 127.0) * .75);
-        motor_go_backward(MOTOR_FR_ID, ((float)abs(steering) / 127.0) * .75);
-        motor_go_backward(MOTOR_RR_ID, ((float)abs(steering) / 127.0) * .75);
+        motor_go_backward(MOTOR_LEFT_ID, ((float)abs(steering) / 127.0) * .75);
+        motor_go_backward(MOTOR_RIGHT_ID, ((float)abs(steering) / 127.0) * .75);
     }
 
     ESP_LOGI(TAG, "throttle: %d\tsteering:%d", throttle, steering);

@@ -291,7 +291,7 @@ void solar_tracking(void *pvParameters)
 
         while (!panel_set)
         {
-            vTaskDelay(pdMS_TO_TICKS(250));
+            vTaskDelay(pdMS_TO_TICKS(3000));
 
             solaris_pt_read(pt, result, true);
             // LEFT RIGHT CHECK
