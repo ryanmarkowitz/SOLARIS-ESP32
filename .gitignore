@@ -16,6 +16,8 @@
 # Log files
 *.log
 
+.vscode
+
 # Build artifacts and directories
 **/build/
 build/
