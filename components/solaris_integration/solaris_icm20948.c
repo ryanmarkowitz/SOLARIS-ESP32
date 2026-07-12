@@ -52,32 +52,14 @@ static esp_err_t prv_read_registers(const struct solaris_icm_ctx_t *ctx, uint8_t
 // Public API
 // ---------------------------------------------------------------------------
 
-esp_err_t solaris_icm20948_init(const solaris_icm20948_config_t *config, solaris_icm20948_handle_t *handle) {
+esp_err_t solaris_icm20948_init(const solaris_icm20948_config_t *config, solaris_icm20948_handle_t *handle) 
+{
     if (!config || !handle) return ESP_ERR_INVALID_ARG;
 
     struct solaris_icm_ctx_t *ctx = calloc(1, sizeof(*ctx));
     if (!ctx) return ESP_ERR_NO_MEM;
 
     ctx->cfg = *config;
-    ctx->i2c_installed_by_us = false;
-
-    // --- 1. I2C Initialization ---
-    i2c_config_t i2c_conf = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = ctx->cfg.i2c_sda,
-        .scl_io_num = ctx->cfg.i2c_scl,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = ctx->cfg.i2c_freq,
-    };
-    
-    i2c_param_config(ctx->cfg.i2c_port, &i2c_conf);
-    esp_err_t err = i2c_driver_install(ctx->cfg.i2c_port, i2c_conf.mode, 0, 0, 0);
-    if (err == ESP_OK) {
-        ctx->i2c_installed_by_us = true;
-    } else if (err != ESP_ERR_INVALID_STATE) {
-        free(ctx); return err;
-    }
 
     // --- 2. GPIO Interrupt Pin ---
     if (ctx->cfg.int_gpio >= 0) {
@@ -88,36 +70,32 @@ esp_err_t solaris_icm20948_init(const solaris_icm20948_config_t *config, solaris
 
     // --- 3. Wake & Verify ICM-20948 ---
     uint8_t who_am_i = 0;
-    err = prv_read_registers(ctx, ctx->cfg.i2c_addr, ICM20948_WHO_AM_I, &who_am_i, 1);
+    esp_err_t err = prv_read_registers(ctx, ctx->cfg.i2c_addr, ICM20948_WHO_AM_I, &who_am_i, 1);
     if (err != ESP_OK || who_am_i != ICM20948_WHO_AM_I_VAL) {
-        ESP_LOGE(TAG, "ICM-20948 WHO_AM_I failed.");
-        if (ctx->i2c_installed_by_us) i2c_driver_delete(ctx->cfg.i2c_port);
-        free(ctx); return ESP_FAIL;
+        ESP_LOGE(TAG, "ICM-20948 WHO_AM_I failed (ID: 0x%02X).", who_am_i);
+        free(ctx); 
+        return ESP_FAIL;
     }
 
     // Clear sleep bit
     prv_write_register(ctx, ctx->cfg.i2c_addr, ICM20948_PWR_MGMT_1, 0x01);
     vTaskDelay(pdMS_TO_TICKS(50));
 
-    // INT Pin Config: 0x10 (Clear on Read) + 0x02 (I2C BYPASS ENABLE) = 0x12
+    // INT Pin Config: 0x32 (Clear on Read + Bypass Enable)
     prv_write_register(ctx, ctx->cfg.i2c_addr, ICM20948_INT_PIN_CFG, 0x32); 
-    vTaskDelay(pdMS_TO_TICKS(10)); // Give bypass switch time to settle
+    vTaskDelay(pdMS_TO_TICKS(10)); 
 
     // Enable Raw Data Ready Interrupt
     prv_write_register(ctx, ctx->cfg.i2c_addr, ICM20948_INT_ENABLE, 0x01);
 
-    // --- 4. Wake & Verify AK09916 Magnetometer (Now accessible via Bypass) ---
+    // --- 4. Wake & Verify AK09916 Magnetometer ---
     uint8_t mag_id = 0;
     err = prv_read_registers(ctx, AK09916_I2C_ADDR, AK09916_WIA2, &mag_id, 1);
     if (err != ESP_OK || mag_id != AK09916_WIA2_VAL) {
         ESP_LOGW(TAG, "AK09916 Magnetometer not found! Check bypass config.");
-        // Non-fatal, we just won't get mag data
     } else {
-        // Soft reset magnetometer
         prv_write_register(ctx, AK09916_I2C_ADDR, AK09916_CNTL3, 0x01);
         vTaskDelay(pdMS_TO_TICKS(10));
-        
-        // Set to Continuous Measurement Mode 4 (100Hz updates)
         prv_write_register(ctx, AK09916_I2C_ADDR, AK09916_CNTL2, 0x08);
     }
 
@@ -125,7 +103,6 @@ esp_err_t solaris_icm20948_init(const solaris_icm20948_config_t *config, solaris
     *handle = ctx;
     return ESP_OK;
 }
-
 // ---------------------------------------------------------------------------
 
 bool solaris_icm20948_data_ready(solaris_icm20948_handle_t handle) {
