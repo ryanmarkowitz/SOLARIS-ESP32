@@ -19,6 +19,7 @@ extern TaskHandle_t xImuDrive;
 extern TaskHandle_t xImuAlign;
 extern TaskHandle_t xUltrasonic;
 extern TaskHandle_t xImuCollision;
+extern TaskHandle_t xTimeSynced;
 
 /*
  * Events sent through xEventQueue. driver_function's blocking waits react

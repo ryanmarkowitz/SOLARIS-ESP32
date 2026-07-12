@@ -173,31 +173,7 @@ esp_err_t solaris_ina228_init(const solaris_ina228_config_t *config,
     ctx->cfg = *config;
     ctx->initial_soc = 100.0f;
     ctx->soc_initialized = false;
-
-    // --- I2C master init ---
-    i2c_config_t i2c_conf = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = config->sda_io,
-        .scl_io_num = config->scl_io,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = config->clk_speed_hz,
-    };
-    esp_err_t err = i2c_param_config(config->i2c_port, &i2c_conf);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "I2C param config failed: %s", esp_err_to_name(err));
-        free(ctx);
-        return err;
-    }
-
-    err = i2c_driver_install(config->i2c_port, I2C_MODE_MASTER, 0, 0, 0);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "I2C driver install failed: %s", esp_err_to_name(err));
-        free(ctx);
-        return err;
-    }
+    esp_err_t err;
 
     // --- Verify device ---
     uint16_t mfg_id = 0;
@@ -205,7 +181,6 @@ esp_err_t solaris_ina228_init(const solaris_ina228_config_t *config,
     if (err != ESP_OK || mfg_id != INA228_MANUFACTURER_ID_VAL)
     {
         ESP_LOGE(TAG, "INA228 not found! Manufacturer ID: 0x%04X", mfg_id);
-        i2c_driver_delete(config->i2c_port);
         free(ctx);
         return ESP_ERR_NOT_FOUND;
     }
@@ -314,18 +289,6 @@ esp_err_t solaris_ina228_read(solaris_ina228_handle_t handle,
         return err;
     result->voltage_v = (float)(raw_vbus >> 4) * INA228_VBUS_LSB_V;
 
-    // V-SHUNT
-    uint32_t raw_vshunt = 0;
-    err = prv_read_reg24(handle, INA228_REG_VSHUNT, &raw_vshunt);
-    if (err != ESP_OK)
-        return err;
-    int32_t shunt_counts = (int32_t)(raw_vshunt >> 4);
-    if (shunt_counts & 0x80000)
-    {                             // bit 19 set => negative
-        shunt_counts -= 0x100000; // subtract 2^20 to sign-extend
-    }
-    result->v_shunt = (float)(raw_vbus >> 4) * INA228_VBUS_LSB_V;
-
     // CURRENT
     uint32_t raw_curr = 0;
     err = prv_read_reg24(handle, INA228_REG_CURRENT, &raw_curr);
@@ -412,15 +375,14 @@ void solaris_ina228_log(solaris_ina228_handle_t handle,
         return;
 
     ESP_LOGI(TAG, "V: %6.3fV | I: %8.4fA (%7.2fmA) | P: %6.4fW | "
-                  "SOC: %5.1f%% | Temp: %.1f°C | Charge: %.2fmAh | Energy: %.4fJ | V Shunt: %.2f",
+                  "SOC: %5.1f%% | Temp: %.1f°C | Charge: %.2fmAh | Energy: %.4fJ",
              result->voltage_v,
              result->current_a, result->current_ma,
              result->power_w,
              result->soc_percent,
              result->temperature_c,
              result->charge_mah,
-             result->energy_j,
-             result->v_shunt);
+             result->energy_j);
 }
 
 // ---------------------------------------------------------------------------

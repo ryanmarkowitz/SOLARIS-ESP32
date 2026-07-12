@@ -54,6 +54,7 @@ extern "C"
 
     extern float solaris_power_buffer[SOLARIS_RING_BUFFER_SIZE];
     extern int solaris_power_buffer_idx;
+
     // ---------------------------------------------------------------------------
     // Configuration struct
     // ---------------------------------------------------------------------------
@@ -140,7 +141,6 @@ extern "C"
         float charge_mah;    /**< Accumulated charge in milliamp-hours. */
         float temperature_c; /**< Die temperature in degrees Celsius. */
         float soc_percent;   /**< Estimated state of charge (0–100%). */
-        float v_shunt;
     } solaris_ina228_result_t;
 
     // ---------------------------------------------------------------------------
@@ -252,7 +252,6 @@ extern "C"
      * @return ESP_OK on success.
      */
     esp_err_t solaris_ina228_deinit(solaris_ina228_handle_t handle);
-
     void solaris_ina228_1s_read(void *pvParmaters);
     void solaris_ina228_make_move_decision(void *pvParameters);
 

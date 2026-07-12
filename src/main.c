@@ -16,6 +16,7 @@
 #include <solaris_mode.h>
 #include <driver.h>
 #include <solaris_ina228.h>
+#include "driver/i2c.h"
 
 #define EVENT_QUEUE_LENGTH 10
 
@@ -33,6 +34,7 @@ TaskHandle_t xImuDrive = NULL;
 TaskHandle_t xImuAlign = NULL;
 TaskHandle_t xUltrasonic = NULL;
 TaskHandle_t xImuCollision = NULL;
+TaskHandle_t xTimeSynced = NULL;
 
 solaris_pt_config_t pt_cfg = SOLARIS_PT_CONFIG_DEFAULT();
 solaris_pt_handle_t pt = NULL;
@@ -50,6 +52,22 @@ void app_main(void)
 {
     // Initialize nimBLE
     vTaskDelay(pdMS_TO_TICKS(3000)); // 3 second delay
+
+    // iniatilize the CPU temp resources
+    cpu_temp_init();
+
+    // Centralized I2C Bus Initialization (Do this ONCE)
+    i2c_config_t i2c_conf = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = 41,
+        .scl_io_num = 40,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .master.clk_speed = 400000,
+    };
+
+    ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &i2c_conf));
+    ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0));
 
     nimble_init();
 
