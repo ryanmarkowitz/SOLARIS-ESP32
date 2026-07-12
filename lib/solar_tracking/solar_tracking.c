@@ -90,16 +90,9 @@ static void prv_raw_to_result(const struct solaris_pt_ctx_t *ctx, int raw,
                               solaris_pt_result_t *out)
 {
     out->raw = raw;
-    if (!ctx->cali_enabled)
-    {
-        // adc_cali_raw_to_voltage(ctx->cali_handle, raw, &out->mv);
-    }
-    else
-    {
-        /* Linear fallback across the attenuation's full-scale range. With
-         * ADC_ATTEN_DB_12 the pin maxes near ~3100 mV, not the sensor VCC. */
-        out->mv = (int)((raw / 4095.0f) * 3100.0f);
-    }
+    /* Linear fallback across the attenuation's full-scale range. With
+     * ADC_ATTEN_DB_12 the pin maxes near ~3100 mV, not the sensor VCC. */
+    out->mv = (int)((raw / 4095.0f) * 3100.0f);
 }
 
 // ---------------------------------------------------------------------------
