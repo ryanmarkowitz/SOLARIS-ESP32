@@ -4,6 +4,7 @@
 .vscode/launch.json
 .vscode/ipch
 .vscode/settings.json
+.vscode 
 
 # macOS
 .DS_Store
