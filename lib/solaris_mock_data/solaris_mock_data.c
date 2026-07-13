@@ -18,21 +18,21 @@ span four overlapping demo windows at increasing density toward the present:
 
 #define TAG "MOCK_DATA"
 
-#define NVS_NS       "solaris_tel"
-#define NVS_KEY_CNT  "count"
+#define NVS_NS "solaris_tel"
+#define NVS_KEY_CNT "count"
 #define NVS_KEY_DATA "records"
 
 /* Window boundaries (seconds before now) */
 #define WINDOW_MONTH (30 * 24 * 3600)
-#define WINDOW_WEEK  ( 7 * 24 * 3600)
-#define WINDOW_DAY   ( 1 * 24 * 3600)
-#define WINDOW_HOUR  (          3600)
+#define WINDOW_WEEK (7 * 24 * 3600)
+#define WINDOW_DAY (1 * 24 * 3600)
+#define WINDOW_HOUR (3600)
 
 /* Record intervals per window */
 #define INTERVAL_MONTH (4 * 3600)
-#define INTERVAL_WEEK  (2 * 3600)
-#define INTERVAL_DAY   (   30 * 60)
-#define INTERVAL_HOUR  (    5 * 60)
+#define INTERVAL_WEEK (2 * 3600)
+#define INTERVAL_DAY (30 * 60)
+#define INTERVAL_HOUR (5 * 60)
 
 /* Approximate worst-case total — sized for the NVS blob */
 #define MOCK_MAX_RECORDS 300
@@ -52,14 +52,22 @@ void solaris_mock_data_seed(void)
     static solaris_telemetry_t records[MOCK_MAX_RECORDS];
     int count = 0;
 
-    uint32_t now = (uint32_t)time(NULL);
+    /* Hardcoded for testing: time(NULL) reads before BLE time sync happens,
+     * which underflows the uint32_t window math below and wraps to ~2106. */
+
+    uint32_t now = 1783944000UL; /* 2026-07-13 12:00:00 UTC */
 
     /* Generate timestamps oldest→newest across four windows */
-    struct { uint32_t start; uint32_t end; uint32_t interval; } windows[] = {
-        { now - WINDOW_MONTH, now - WINDOW_WEEK, INTERVAL_MONTH },
-        { now - WINDOW_WEEK,  now - WINDOW_DAY,  INTERVAL_WEEK  },
-        { now - WINDOW_DAY,   now - WINDOW_HOUR, INTERVAL_DAY   },
-        { now - WINDOW_HOUR,  now,               INTERVAL_HOUR  },
+    struct
+    {
+        uint32_t start;
+        uint32_t end;
+        uint32_t interval;
+    } windows[] = {
+        {now - WINDOW_MONTH, now - WINDOW_WEEK, INTERVAL_MONTH},
+        {now - WINDOW_WEEK, now - WINDOW_DAY, INTERVAL_WEEK},
+        {now - WINDOW_DAY, now - WINDOW_HOUR, INTERVAL_DAY},
+        {now - WINDOW_HOUR, now, INTERVAL_HOUR},
     };
 
     for (int w = 0; w < 4; w++)
@@ -77,10 +85,10 @@ void solaris_mock_data_seed(void)
             /* CPU temp: 45–75 °C, rises with solar load and record density */
             uint8_t cpu_temp = (uint8_t)(60 + 15 * sinf((float)count * 0.11f));
 
-            records[count].timestamp        = ts;
-            records[count].cpu_temp         = cpu_temp;
-            records[count].battery_percent  = batt;
-            records[count].distance_m       = dist;
+            records[count].timestamp = ts;
+            records[count].cpu_temp = cpu_temp;
+            records[count].battery_percent = batt;
+            records[count].distance_m = dist;
             records[count].net_power_gain_w = power;
             count++;
         }

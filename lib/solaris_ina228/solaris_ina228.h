@@ -54,6 +54,8 @@ extern "C"
 
     extern float solaris_power_buffer[SOLARIS_RING_BUFFER_SIZE];
     extern int solaris_power_buffer_idx;
+    extern float solaris_power_buffer_with_moves_included[60];
+    extern int solaris_power_buffer_with_moves_included_idx;
 
     // ---------------------------------------------------------------------------
     // Configuration struct
@@ -252,6 +254,7 @@ extern "C"
      * @return ESP_OK on success.
      */
     esp_err_t solaris_ina228_deinit(solaris_ina228_handle_t handle);
+
     void solaris_ina228_1s_read(void *pvParmaters);
     void solaris_ina228_make_move_decision(void *pvParameters);
 

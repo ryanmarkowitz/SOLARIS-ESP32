@@ -7,6 +7,7 @@
 /* Handles for shared semaphores / mutexes */
 extern SemaphoreHandle_t actuator_mutex; // Only drive motors or panel motors are allowed to move, don't let them move at the same time
 extern SemaphoreHandle_t solaris_energy_monitor_resource;
+extern SemaphoreHandle_t solaris_energy_monitor_resource_with_moves;
 extern SemaphoreHandle_t i2c_bus_mutex; // INA228 and ICM20948 share I2C_NUM_0 -- serializes every bus transaction between them
 extern SemaphoreHandle_t pt_bus_mutex;  // solar_tracking and driver_function both call solaris_pt_read() on the same mux-select GPIOs + ADC channel
 

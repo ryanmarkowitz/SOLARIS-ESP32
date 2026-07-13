@@ -33,7 +33,9 @@ static const char *TAG = "SOLARIS_INA228";
 #define INA228_CONFIG_RSTACC (1 << 14)
 
 int solaris_power_buffer_idx = 0;
+int solaris_power_buffer_with_moves_included_idx = 0;
 float solaris_power_buffer[SOLARIS_RING_BUFFER_SIZE];
+float solaris_power_buffer_with_moves_included[60];
 
 // ---------------------------------------------------------------------------
 // Internal context
@@ -473,24 +475,46 @@ void solaris_ina228_1s_read(void *pvParmaters)
     while (1)
     {
         // don't keep track unless the robot isn't moving currently Also grab the mutex for writing to the shared buffer
-        xSemaphoreTake(actuator_mutex, portMAX_DELAY);
-        xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
-        // Read the energy units power and store the result in the ring buffer
-        solaris_ina228_read(handle, &result);
-        solaris_power_buffer[solaris_power_buffer_idx] = result.power_w;
-        solaris_power_buffer_idx = (solaris_power_buffer_idx + 1) % 180;
-
-        // give back mutexes
-        xSemaphoreGive(solaris_energy_monitor_resource);
-        xSemaphoreGive(actuator_mutex);
-
-        counter++;
-        if (counter == SOLARIS_RING_BUFFER_SIZE)
+        if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
         {
-            // after 3 minutes of information is filled, notify move decision task to fire
-            counter = 0;
-            xTaskNotifyGive(xMoveDecision);
+            xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
+            xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
+            xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);
+            // Read the energy units power and store the result in the ring buffer
+            solaris_ina228_read(handle, &result);
+
+            solaris_power_buffer[solaris_power_buffer_idx] = result.power_w;
+            solaris_power_buffer_idx = (solaris_power_buffer_idx + 1) % 180;
+            solaris_power_buffer_with_moves_included[solaris_power_buffer_with_moves_included_idx] = result.power_w;
+            solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 180;
+
+            // give back mutexes
+            xSemaphoreGive(solaris_energy_monitor_resource);
+            xSemaphoreGive(actuator_mutex);
+            xSemaphoreGive(i2c_bus_mutex);
+            xSemaphoreGive(solaris_energy_monitor_resource_with_moves);
+
+            counter++;
+            if (counter == SOLARIS_RING_BUFFER_SIZE)
+            {
+                // after 3 minutes of information is filled, notify move decision task to fire
+                counter = 0;
+                xTaskNotifyGive(xMoveDecision);
+            }
         }
+        else // Solaris is moving. In the event it is moving only add value to the with moves buffer
+        {
+            xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
+            xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);
+
+            solaris_ina228_read(handle, &result);
+            solaris_power_buffer_with_moves_included[solaris_power_buffer_with_moves_included_idx] = result.power_w;
+            solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 180;
+
+            xSemaphoreGive(solaris_energy_monitor_resource_with_moves);
+            xSemaphoreGive(i2c_bus_mutex);
+        }
+
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }

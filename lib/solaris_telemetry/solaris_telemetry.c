@@ -28,16 +28,43 @@ void solaris_telemetry_load(void)
 
     if (count > 0 && count <= SOLARIS_TELEMETRY_LOG_CAPACITY)
     {
-        size_t size = (size_t)count * sizeof(solaris_telemetry_t);
-        err = nvs_get_blob(handle, NVS_KEY_DATA, g_log, &size);
-        if (err == ESP_OK)
+        /* Query the actual stored blob size before reading it. If a prior
+         * firmware wrote records using a different (e.g. smaller) layout
+         * of solaris_telemetry_t, the blob won't match count * sizeof(...)
+         * and reading it as the current struct layout would silently
+         * misinterpret the bytes (nvs_get_blob only errors when the
+         * caller's buffer is too small, not too large). */
+        size_t stored_size = 0;
+        err = nvs_get_blob(handle, NVS_KEY_DATA, NULL, &stored_size);
+        size_t expected_size = (size_t)count * sizeof(solaris_telemetry_t);
+
+        if (err == ESP_OK && stored_size == expected_size)
         {
-            g_log_count = (int)count;
-            ESP_LOGI(TAG, "loaded %d telemetry records from NVS", g_log_count);
+            size_t size = expected_size;
+            err = nvs_get_blob(handle, NVS_KEY_DATA, g_log, &size);
+            if (err == ESP_OK)
+            {
+                g_log_count = (int)count;
+                ESP_LOGI(TAG, "loaded %d telemetry records from NVS", g_log_count);
+            }
+            else
+            {
+                ESP_LOGE(TAG, "failed to read telemetry blob: %s", esp_err_to_name(err));
+            }
+        }
+        else if (err == ESP_OK)
+        {
+            ESP_LOGW(TAG,
+                     "telemetry blob size mismatch (stored %u, expected %u) - "
+                     "discarding stale log from an incompatible firmware version",
+                     (unsigned)stored_size, (unsigned)expected_size);
+            nvs_close(handle);
+            solaris_telemetry_log_clear();
+            return;
         }
         else
         {
-            ESP_LOGE(TAG, "failed to read telemetry blob: %s", esp_err_to_name(err));
+            ESP_LOGE(TAG, "failed to query telemetry blob size: %s", esp_err_to_name(err));
         }
     }
 

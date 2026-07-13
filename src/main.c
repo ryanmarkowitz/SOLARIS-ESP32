@@ -18,6 +18,7 @@
 #include <solaris_ina228.h>
 #include "driver/i2c.h"
 #include <log_telemetry.h>
+#include <solaris_mock_data.h>
 
 #define EVENT_QUEUE_LENGTH 10
 
@@ -25,6 +26,7 @@
 
 SemaphoreHandle_t actuator_mutex = NULL;
 SemaphoreHandle_t solaris_energy_monitor_resource = NULL;
+SemaphoreHandle_t solaris_energy_monitor_resource_with_moves = NULL;
 SemaphoreHandle_t i2c_bus_mutex = NULL;
 SemaphoreHandle_t pt_bus_mutex = NULL;
 QueueHandle_t xEventQueue = NULL;
@@ -52,7 +54,7 @@ solaris_us_handle_t us_handle = NULL;
 void app_main(void)
 {
     // Initialize nimBLE
-    vTaskDelay(pdMS_TO_TICKS(3000)); // 3 second delay
+    vTaskDelay(pdMS_TO_TICKS(1000)); // 1 second delay
 
     // iniatilize the CPU temp resources
     cpu_temp_init();
@@ -81,6 +83,8 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(err);
 
+    // solaris_mock_data_seed(); // TODO: remove - seeds fake telemetry for testing
+
     encoder_init();
     motor_init();
 
@@ -88,6 +92,7 @@ void app_main(void)
     // themselves talk over I2C_NUM_0 and need this mutex to already exist.
     i2c_bus_mutex = xSemaphoreCreateMutex();
     pt_bus_mutex = xSemaphoreCreateMutex();
+    solaris_energy_monitor_resource_with_moves = xSemaphoreCreateMutex();
 
     // initialize the phototransistors
     bool pt_ok = (solaris_pt_init(&pt_cfg, &pt) == ESP_OK);
@@ -128,6 +133,7 @@ void app_main(void)
     // xTaskCreatePinnedToCore(imu_align_task, "imu align", 4096, NULL, 10, &xImuAlign, 1);
     // xTaskCreatePinnedToCore(ultrasonic_task, "ultrasonic", 4096, NULL, 15, &xUltrasonic, 1);
     // xTaskCreatePinnedToCore(imu_collision_task, "imu collision", 4096, NULL, 14, &xImuCollision, 0);
+    xTaskCreatePinnedToCore(log_telemetry, "logging telemetry to nvs", 4096, NULL, 4, NULL, 0);
 
     // xTaskCreate(test_motor, "test motor", 4096, NULL, 15, NULL);
 }
