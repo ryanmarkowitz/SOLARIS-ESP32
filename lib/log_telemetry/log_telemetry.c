@@ -25,7 +25,7 @@ void log_telemetry(void *pvParameters)
     const TickType_t period = pdMS_TO_TICKS(60000);
     int32_t count = -1;
     solaris_telemetry_t record;
-    xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY);
+    xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY);  // Wait for time sync to happen before allowing logging
     while (1)
     {
         struct timeval tv;

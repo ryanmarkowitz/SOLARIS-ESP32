@@ -319,15 +319,17 @@ Telemetry notification payload layout (per page, little-endian):
   [0]      page_index    (uint8_t)
   [1]      total_pages   (uint8_t)
   [2]      record_count  (uint8_t)  records in this page
-  [3..]    records       (9 bytes each): ...
+  [3..]    records       (11 bytes each): timestamp(u32) cpu_temp(u8)
+             battery_percent(u8) distance_m(float32) net_power_gain_w(i8)
 Control characteristic write commands (1 byte):
   0x01 = REQUEST_PAGE, 0x02 = ACK_PAGE, 0x03 = CLEAR_LOG
 Time sync characteristic write payload: [0..3] unix timestamp
 Weather forecast characteristic write payload (152 bytes, little-endian): ...
 ```
-⚠️ This comment says records are "9 bytes each," but `TELEMETRY_RECORD_SIZE` is actually `8`
-(matching the real `solaris_telemetry_t` struct: 4+1+1+1+1 bytes). Fix the comment/protocol
-docs before sharing externally.
+`distance_m` was widened from `uint8_t` to `float` (IEEE-754 binary32, little-endian) so
+fractional meters aren't truncated; `TELEMETRY_RECORD_SIZE` is `11` and
+`SOLARIS_TELEMETRY_RECORDS_PER_PAGE` was lowered to `20` to keep a full page under the
+negotiated ATT MTU.
 
 One primary service (UUID prefix `0xd0`) with 6 characteristics (128-bit UUIDs differing in
 first byte):
@@ -509,12 +511,13 @@ typedef struct {
     uint32_t timestamp;
     uint8_t  cpu_temp;
     uint8_t  battery_percent;
-    uint8_t  distance_m;
+    float    distance_m;
     int8_t   net_power_gain_w;
-} solaris_telemetry_t; // 8 bytes
+} solaris_telemetry_t; // 11 bytes on the wire (struct itself is padded in memory)
 ```
-`SOLARIS_TELEMETRY_LOG_CAPACITY` = 1440 (in-RAM array, ~11.5KB static RAM);
-`SOLARIS_TELEMETRY_RECORDS_PER_PAGE` = 30.
+`SOLARIS_TELEMETRY_LOG_CAPACITY` = 1440 (in-RAM array, ~17.3KB static RAM);
+`SOLARIS_TELEMETRY_RECORDS_PER_PAGE` = 20 (lowered from 30 to keep a page under the BLE MTU
+now that `distance_m` is a 4-byte float instead of 1 byte).
 
 - `solaris_telemetry_load()` — reads `count`/`records` blobs from NVS (`"solaris_tel"`) into
   `g_log`.
@@ -683,8 +686,8 @@ this checkout):**
    swapped relative to every other ADC module in the repo.
 4. `solaris_icm20948.c` — `INT_PIN_CFG` write value (`0x32`) doesn't match what the adjacent
    comment computes (`0x12`); verify against the datasheet.
-5. `gatt_svc.c` — protocol-doc comment says telemetry records are 9 bytes; actual struct/macro
-   size is 8 bytes.
+5. ~~`gatt_svc.c` — protocol-doc comment said telemetry records were 9 bytes; actual struct/macro
+   size was 8 bytes.~~ Fixed: `distance_m` is now a float, comment/macro both say 11 bytes.
 6. `encoders.c` pin-assignment comment is stale relative to the actual `encoder_pins[]` array.
 7. `solar_tracking.h` Doxygen `@file` tag says `solaris_phototransistor.h` (old filename).
 8. `gap.c` — advertising scan response still uses the Espressif example placeholder URI
@@ -733,7 +736,7 @@ this checkout):**
    plausible additions but aren't part of the written spec.
 5. Fix the calibration branch inversion in `solar_tracking.c`.
 6. Verify the ICM-20948 `INT_PIN_CFG` value against the datasheet.
-7. Correct the stale encoder pin-assignment comment and the `gatt_svc.c` 9-byte/8-byte
-   telemetry record doc mismatch.
+7. Correct the stale encoder pin-assignment comment (the telemetry record doc mismatch is
+   fixed).
 8. Decide the fate of `write_log_and_buffers()` (`driver.h`) — implement or remove the
    declaration.

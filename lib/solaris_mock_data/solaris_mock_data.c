@@ -73,7 +73,7 @@ void solaris_mock_data_seed(void)
             /* Clamp battery 20–95 % with a slow drift tied to record index */
             uint8_t batt = (uint8_t)(57 + 38 * sinf((float)count * 0.07f));
             /* Distance moved in the last minute: 0–30 m, modulated by variation */
-            uint8_t dist = (uint8_t)(15 + 14 * sinf((float)count * 0.13f));
+            float dist = 15.0f + 14.0f * sinf((float)count * 0.13f);
             /* CPU temp: 45–75 °C, rises with solar load and record density */
             uint8_t cpu_temp = (uint8_t)(60 + 15 * sinf((float)count * 0.11f));
 

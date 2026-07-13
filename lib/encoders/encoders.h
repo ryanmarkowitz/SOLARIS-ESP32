@@ -46,7 +46,7 @@ typedef struct
 void encoder_init();
 esp_err_t save_position_to_flash(uint8_t encoder_id);
 int get_pulse_count(uint8_t encoder_id);
-int get_distance_traveled();
+float get_distance_traveled();
 
 extern int saved_pan_position;
 extern int saved_tilt_position;

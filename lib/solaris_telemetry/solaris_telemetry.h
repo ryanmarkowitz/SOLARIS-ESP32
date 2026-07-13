@@ -10,14 +10,17 @@
 #include <stdint.h>
 
 #define SOLARIS_TELEMETRY_LOG_CAPACITY 1440
-#define SOLARIS_TELEMETRY_RECORDS_PER_PAGE 30
+/* distance_m is now a 4-byte float on the wire (was 1 byte), so this is
+ * capped to keep a full page under the negotiated BLE ATT MTU (256, see
+ * sdkconfig CONFIG_BT_NIMBLE_ATT_PREFERRED_MTU) minus the 3-byte ATT header. */
+#define SOLARIS_TELEMETRY_RECORDS_PER_PAGE 20
 
 typedef struct
 {
     uint32_t timestamp; /* Unix timestamp */
     uint8_t cpu_temp;   /* CPU temperature in °C */
     uint8_t battery_percent;
-    uint8_t distance_m;
+    float distance_m;
     int8_t net_power_gain_w;
 } solaris_telemetry_t;
 

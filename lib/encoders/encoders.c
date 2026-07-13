@@ -18,6 +18,9 @@
 #define FORWARD_TARGET_TILT 350   // maps to +30 degrees
 #define BACKWARD_TARGET_TILT -350 // maps to -30 degrees
 
+#define PULSES_TO_360 2650
+#define WHEEL_CIRCUMFERENCE_M .1016
+
 static int load_position_from_flash(uint8_t encoder_id);
 static encoder_ctxt_t enc_ctxt[NUM_ENCODERS];
 
@@ -329,20 +332,19 @@ done:
     return err;
 }
 
-int get_distance_traveled()
+float get_distance_traveled()
 {
     // TODO change the pulses to convert to m traveled
     // This implementation will fail as is since there will be overflows.
     // We need to convert pulses to distance traveled before summing the distance
     // This is just temp code for idea of where to go next
-    int cur_pan_pulses, cur_tilt_pulses;
-    ESP_ERROR_CHECK(pcnt_unit_get_count(encoders[PAN_ENCODER_ID].pcnt_unit, &cur_pan_pulses));
-    ESP_ERROR_CHECK(pcnt_unit_get_count(encoders[TILT_ENCODER_ID].pcnt_unit, &cur_tilt_pulses));
-    int sum = 0;
-    sum += overflow_counter_FL * HIGH_LIMIT;
-    sum += cur_pan_pulses;
-    sum += cur_tilt_pulses;
-    int avg = sum / 2;
+    int cur_drive_pulses;
+    ESP_ERROR_CHECK(pcnt_unit_get_count(encoders[FL_ENCODER_ID].pcnt_unit, &cur_drive_pulses));
+    float pulses_to_360 = (float)cur_drive_pulses / PULSES_TO_360;
+    float overflow_pulses_to_360 = (HIGH_LIMIT/pulses_to_360) * overflow_counter_FL;
+    float distance_traveled = overflow_pulses_to_360 * WHEEL_CIRCUMFERENCE_M;
+    distance_traveled += pulses_to_360 * WHEEL_CIRCUMFERENCE_M;
+    
 
     // set overflows back to 0 so we can calculate distnace traveled next time
     overflow_counter_FL = 0;
@@ -351,5 +353,5 @@ int get_distance_traveled()
     ESP_ERROR_CHECK(pcnt_unit_clear_count(encoders[PAN_ENCODER_ID].pcnt_unit));
     ESP_ERROR_CHECK(pcnt_unit_clear_count(encoders[TILT_ENCODER_ID].pcnt_unit));
 
-    return avg;
+    return distance_traveled;
 }
