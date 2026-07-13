@@ -29,7 +29,7 @@ FL = 4, FR = 5
 RL = 6, RR = 7
 */
 
-#define VOLTAGE_TOLERANCE 500
+#define VOLTAGE_TOLERANCE 180
 
 // ---------------------------------------------------------------------------
 // Internal context
@@ -284,7 +284,7 @@ void solar_tracking(void *pvParameters)
 
         while (!panel_set)
         {
-            vTaskDelay(pdMS_TO_TICKS(3000));
+            vTaskDelay(pdMS_TO_TICKS(250));
 
             solaris_pt_read(pt, result, true);
             // LEFT RIGHT CHECK

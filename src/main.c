@@ -17,6 +17,7 @@
 #include <driver.h>
 #include <solaris_ina228.h>
 #include "driver/i2c.h"
+#include <log_telemetry.h>
 
 #define EVENT_QUEUE_LENGTH 10
 

@@ -379,7 +379,10 @@ static int handle_time_sync_write(struct ble_gatt_access_ctxt *ctxt)
     // Now we can get timestamp at any point by including time.h and using (uint32_t)time(NULL)
     settimeofday(&tv, NULL);
     ESP_LOGI(TAG, "system clock set to %lu", (unsigned long)unix_ts);
-    xTaskNotify(xTimeSynced, NULL, eSetValueWithOverwrite);
+    if (xTimeSynced != NULL)
+    {
+        xTaskNotify(xTimeSynced, 0, eSetValueWithOverwrite);
+    }
     return 0;
 }
 

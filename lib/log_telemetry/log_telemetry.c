@@ -6,6 +6,7 @@
 #include <solaris_telemetry.h>
 #include <encoders.h>
 #include "driver/temperature_sensor.h"
+#include <solaris_ina228.h>
 
 #define NVS_NS "solaris_tel"
 #define NVS_KEY_CNT "count"
@@ -18,6 +19,7 @@ static temperature_sensor_config_t temp_sensor_config = TEMPERATURE_SENSOR_CONFI
 
 static void get_cpu_temp();
 
+// TODO get ina228 handle from pvparameters
 void log_telemetry(void *pvParameters)
 {
     nvs_handle_t handle;
@@ -26,6 +28,7 @@ void log_telemetry(void *pvParameters)
     int32_t count = -1;
     solaris_telemetry_t record;
     xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY);
+    solaris_ina228_result_t result;
     while (1)
     {
         struct timeval tv;
@@ -33,6 +36,13 @@ void log_telemetry(void *pvParameters)
         record.timestamp = tv.tv_sec;
         // TODO get implementation to get the telemetry information
         uint8_t battery_level = 0, net_power_w = 0;
+
+        // xSemaphoreTake(mutex)
+        // ina228_handle;
+        // solaris_ina228_read(ina228_handle, &result);
+        // battery_level = (uint8_t)result.soc_percent;
+        // xSempahoreGive(mutex);
+
         record.distance_m = get_distance_traveled();
         record.battery_percent = battery_level;
         record.net_power_gain_w = net_power_w;
