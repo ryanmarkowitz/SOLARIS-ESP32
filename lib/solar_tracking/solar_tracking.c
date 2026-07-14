@@ -29,7 +29,7 @@ FL = 4, FR = 5
 RL = 6, RR = 7
 */
 
-#define VOLTAGE_TOLERANCE 180
+#define VOLTAGE_TOLERANCE 250
 
 // ---------------------------------------------------------------------------
 // Internal context

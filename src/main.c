@@ -85,6 +85,10 @@ void app_main(void)
 
     // solaris_mock_data_seed(); // TODO: remove - seeds fake telemetry for testing
 
+    // Uncomment to wipe saved pan/tilt position from flash before it's loaded in encoder_init()
+    // clear_position_from_flash(PAN_ENCODER_ID);
+    // clear_position_from_flash(TILT_ENCODER_ID);
+
     encoder_init();
     motor_init();
 

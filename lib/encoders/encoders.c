@@ -46,6 +46,7 @@ ENCODER 0 - PAN ENCODER
 ENCODER 1 - TILT ENCODER
 ENCODER 2 - FL ENCODER
 */
+
 static encoder_t encoders[NUM_ENCODERS];
 
 // used to track if driving motors overflowed and if so how many times
@@ -286,8 +287,7 @@ static int load_position_from_flash(uint8_t encoder_id)
         ESP_LOGI(TAG, "Position loaded from flash: %d", (int)position);
     }
     nvs_close(nvs_handle);
-    // return position;
-    return 0;
+    return position;
 }
 
 // when motor drivers are done moving the panel, save the position to flash
@@ -332,6 +332,40 @@ done:
     return err;
 }
 
+// clears the saved position for the given encoder from flash. Useful for testing so the panel
+// doesn't home to a stale position - toggle the call site in main.c to run this on boot.
+esp_err_t clear_position_from_flash(uint8_t encoder_id)
+{
+    const char *key_string = (encoder_id == PAN_ENCODER_ID) ? NVS_KEY_PAN_POSITION : NVS_KEY_TILT_POSITION;
+
+    nvs_handle_t nvs_handle;
+    esp_err_t err;
+
+    err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Error opening NVS handle");
+        goto done;
+    }
+
+    err = nvs_erase_key(nvs_handle, key_string);
+    if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
+    {
+        ESP_LOGE(TAG, "Error erasing key from NVS");
+        goto done;
+    }
+
+    err = nvs_commit(nvs_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Error committing to NVS");
+    }
+
+done:
+    nvs_close(nvs_handle);
+    return err;
+}
+
 float get_distance_traveled()
 {
     // TODO change the pulses to convert to m traveled
@@ -341,10 +375,9 @@ float get_distance_traveled()
     int cur_drive_pulses;
     ESP_ERROR_CHECK(pcnt_unit_get_count(encoders[FL_ENCODER_ID].pcnt_unit, &cur_drive_pulses));
     float pulses_to_360 = (float)cur_drive_pulses / PULSES_TO_360;
-    float overflow_pulses_to_360 = (HIGH_LIMIT/pulses_to_360) * overflow_counter_FL;
+    float overflow_pulses_to_360 = (HIGH_LIMIT / pulses_to_360) * overflow_counter_FL;
     float distance_traveled = overflow_pulses_to_360 * WHEEL_CIRCUMFERENCE_M;
     distance_traveled += pulses_to_360 * WHEEL_CIRCUMFERENCE_M;
-    
 
     // set overflows back to 0 so we can calculate distnace traveled next time
     overflow_counter_FL = 0;

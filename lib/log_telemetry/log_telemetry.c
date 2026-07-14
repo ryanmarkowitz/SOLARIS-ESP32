@@ -7,6 +7,7 @@
 #include <encoders.h>
 #include "driver/temperature_sensor.h"
 #include <solaris_ina228.h>
+#include <stdlib.h>
 
 #define NVS_NS "solaris_tel"
 #define NVS_KEY_CNT "count"
@@ -27,7 +28,7 @@ void log_telemetry(void *pvParameters)
     const TickType_t period = pdMS_TO_TICKS(60000);
     int32_t count = -1;
     solaris_telemetry_t record;
-    xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY);  // Wait for time sync to happen before allowing logging
+    xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY); // Wait for time sync to happen before allowing logging
     solaris_ina228_result_t result;
     while (1)
     {
@@ -42,6 +43,17 @@ void log_telemetry(void *pvParameters)
         // solaris_ina228_read(ina228_handle, &result);
         // battery_level = (uint8_t)result.soc_percent;
         // xSempahoreGive(mutex);
+
+        // xSemaphoreTake(mutex)
+        // grab average from buffer with moves
+        // net_power_w = avg_power
+        // xSemaphoreGive(mutex)
+
+        // TODO change current random power and SOC to real integration above
+        srand(time(NULL));
+
+        battery_level = (rand() % 100) + 1;
+        net_power_w = (rand() % 20) + 1;
 
         record.distance_m = get_distance_traveled();
         record.battery_percent = battery_level;

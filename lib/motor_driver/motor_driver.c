@@ -218,14 +218,9 @@ void test_motor(void *pvParameters)
     while (1)
     {
 
-        stop_motor(MOTOR_LEFT_ID);
-        stop_motor(MOTOR_RIGHT_ID);
-        vTaskDelay(pdMS_TO_TICKS(3000));
-        motor_go_forward(MOTOR_LEFT_ID, .75);
-        motor_go_forward(MOTOR_RIGHT_ID, .75);
-        vTaskDelay(pdMS_TO_TICKS(3000));
-        motor_go_backward(MOTOR_LEFT_ID, .75);
-        motor_go_backward(MOTOR_RIGHT_ID, .75);
-        vTaskDelay(pdMS_TO_TICKS(3000));
+        stop_motor(MOTOR_TILT_ID);
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        motor_go_forward(MOTOR_TILT_ID, .15);
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
 }

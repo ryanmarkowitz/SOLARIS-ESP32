@@ -45,6 +45,7 @@ typedef struct
 /* Function declarations */
 void encoder_init();
 esp_err_t save_position_to_flash(uint8_t encoder_id);
+esp_err_t clear_position_from_flash(uint8_t encoder_id);
 int get_pulse_count(uint8_t encoder_id);
 float get_distance_traveled();
 

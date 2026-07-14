@@ -472,6 +472,7 @@ void solaris_ina228_1s_read(void *pvParmaters)
     solaris_ina228_handle_t handle = (solaris_ina228_handle_t)pvParmaters;
     solaris_ina228_result_t result;
     int counter = 0;
+    TickType_t last = xTaskGetTickCount();
     while (1)
     {
         // don't keep track unless the robot isn't moving currently Also grab the mutex for writing to the shared buffer
@@ -515,6 +516,6 @@ void solaris_ina228_1s_read(void *pvParmaters)
             xSemaphoreGive(i2c_bus_mutex);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelayUntil(&last, pdMS_TO_TICKS(1000));
     }
 }
