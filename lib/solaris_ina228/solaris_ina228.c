@@ -418,9 +418,11 @@ esp_err_t solaris_ina228_deinit(solaris_ina228_handle_t handle)
 
 void solaris_ina228_make_move_decision(void *pvParameters)
 {
+    solaris_ina228_handle_t handle = (solaris_ina228_handle_t)pvParameters;
     float median_last_30s;
     float median_last_3m;
     solaris_weather_t weather;
+    solaris_ina228_result_t result;
     uint32_t now;
     uint32_t bits;
     while (1)
@@ -446,21 +448,26 @@ void solaris_ina228_make_move_decision(void *pvParameters)
             xSemaphoreGive(solaris_energy_monitor_resource);
             // If the last 30 seconds has seen a 5% drop it is likely shade / clouds over the panel.
             // Determine if cloud percentage is low and then move the robot if that's the case
-            if (median_last_30s * 1.05 < median_last_3m)
-            {
+            solaris_ina228_read(handle, &result);
+            if (result.current_a != 0)
+            { // If current is at 0.0mA then the battery is likely fully charged. Don't bother moving
 
-                const solaris_forecast_entry_t *forecast_now = solaris_weather_get_forecast_at(&weather, now);
-                uint8_t cloud_cover_pct = forecast_now ? forecast_now->cloud_cover_pct : 0;
-                // If cloud coverage percentage is high either don't move at all, or add extra logic on if you should move
-                if (cloud_cover_pct > CLOUD_COVERAGE_PERCENTAGE_DECISION)
+                if (median_last_30s * 1.05 < median_last_3m)
                 {
-                    ;
-                }
-                else
-                {
-                    // Send notification to move
-                    memcpy(&bits, &median_last_3m, sizeof(bits));
-                    xTaskNotify(xDriverFunction, bits, eSetValueWithOverwrite);
+
+                    const solaris_forecast_entry_t *forecast_now = solaris_weather_get_forecast_at(&weather, now);
+                    uint8_t cloud_cover_pct = forecast_now ? forecast_now->cloud_cover_pct : 0;
+                    // If cloud coverage percentage is high either don't move at all, or add extra logic on if you should move
+                    if (cloud_cover_pct > CLOUD_COVERAGE_PERCENTAGE_DECISION)
+                    {
+                        ;
+                    }
+                    else
+                    {
+                        // Send notification to move
+                        memcpy(&bits, &median_last_3m, sizeof(bits));
+                        xTaskNotify(xDriverFunction, bits, eSetValueWithOverwrite);
+                    }
                 }
             }
         }
@@ -479,20 +486,18 @@ void solaris_ina228_1s_read(void *pvParmaters)
         if (xSemaphoreTake(actuator_mutex, 0) == pdTRUE)
         {
             xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
-            xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
             xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);
             // Read the energy units power and store the result in the ring buffer
             solaris_ina228_read(handle, &result);
 
-            solaris_power_buffer[solaris_power_buffer_idx] = result.power_w;
+            solaris_power_buffer[solaris_power_buffer_idx] = -result.power_w;
             solaris_power_buffer_idx = (solaris_power_buffer_idx + 1) % 180;
-            solaris_power_buffer_with_moves_included[solaris_power_buffer_with_moves_included_idx] = result.power_w;
+            solaris_power_buffer_with_moves_included[solaris_power_buffer_with_moves_included_idx] = -result.power_w;
             solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 180;
 
             // give back mutexes
             xSemaphoreGive(solaris_energy_monitor_resource);
             xSemaphoreGive(actuator_mutex);
-            xSemaphoreGive(i2c_bus_mutex);
             xSemaphoreGive(solaris_energy_monitor_resource_with_moves);
 
             counter++;
@@ -505,7 +510,6 @@ void solaris_ina228_1s_read(void *pvParmaters)
         }
         else // Solaris is moving. In the event it is moving only add value to the with moves buffer
         {
-            xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
             xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);
 
             solaris_ina228_read(handle, &result);
@@ -513,7 +517,6 @@ void solaris_ina228_1s_read(void *pvParmaters)
             solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 180;
 
             xSemaphoreGive(solaris_energy_monitor_resource_with_moves);
-            xSemaphoreGive(i2c_bus_mutex);
         }
 
         vTaskDelayUntil(&last, pdMS_TO_TICKS(1000));

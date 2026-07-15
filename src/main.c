@@ -131,7 +131,7 @@ void app_main(void)
     // IF YOU GET STACK OVERFLOW ERRORS CHANGE 4096 TO HIGHER NUMBER AS THIS IS THE STACK DEPTH ALLOCATION
     xTaskCreatePinnedToCore(solar_tracking, "solar tracking", 4096, NULL, 20, &xSolarTracking, 1);
     xTaskCreatePinnedToCore(driver_function, "driving function", 4096, NULL, 19, &xDriverFunction, 1);
-    // xTaskCreatePinnedToCore(solaris_ina228_make_move_decision, "move decision function", 4096, NULL, 8, &xMoveDecision, 0);
+    // xTaskCreatePinnedToCore(solaris_ina228_make_move_decision, "move decision function", 4096, ina228_handle, 8, &xMoveDecision, 0);
     xTaskCreatePinnedToCore(solaris_ina228_1s_read, "energy read", 4096, ina228_handle, 15, NULL, 0);
     // xTaskCreatePinnedToCore(imu_drive_task, "imu drive", 4096, NULL, 10, &xImuDrive, 1);
     // xTaskCreatePinnedToCore(imu_align_task, "imu align", 4096, NULL, 10, &xImuAlign, 1);

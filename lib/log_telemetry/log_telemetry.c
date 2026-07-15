@@ -34,6 +34,7 @@ void log_telemetry(void *pvParameters)
     double avg = 0;
     while (1)
     {
+        ESP_LOGI(TAG, "Starting logging task");
         struct timeval tv;
         gettimeofday(&tv, NULL);
         record.timestamp = tv.tv_sec;
@@ -41,10 +42,15 @@ void log_telemetry(void *pvParameters)
         uint8_t battery_level = 0, net_power_w = 0;
 
         // Get state of charge of battery from the energy monitor unit
-        xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
         solaris_ina228_read(ina228_handle, &result);
-        xSemaphoreGive(i2c_bus_mutex);
-        battery_level = (uint8_t)result.soc_percent;
+        if (result.current_ma == 0) // If no current is flowing then charge controller found the battery is fully charged.
+        {
+            battery_level = (uint8_t)100;
+        }
+        else
+        {
+            battery_level = (uint8_t)result.soc_percent;
+        }
 
         // Get the average net power gain / loss from last minute
         xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);
@@ -52,7 +58,7 @@ void log_telemetry(void *pvParameters)
         {
             sum += solaris_power_buffer_with_moves_included[i];
         }
-        xSemaphoreGive(solaris_power_buffer_with_moves_included);
+        xSemaphoreGive(solaris_energy_monitor_resource_with_moves);
         avg = sum / 60;
         net_power_w = avg;
 
