@@ -8,6 +8,8 @@
 #include "driver/temperature_sensor.h"
 #include <solaris_ina228.h>
 #include <stdlib.h>
+#include "shared_resources.h"
+#include <solaris_ina228.h>
 
 #define NVS_NS "solaris_tel"
 #define NVS_KEY_CNT "count"
@@ -17,8 +19,6 @@
 
 static temperature_sensor_handle_t temp_handle = NULL;
 static temperature_sensor_config_t temp_sensor_config = TEMPERATURE_SENSOR_CONFIG_DEFAULT(20, 100);
-
-static void get_cpu_temp();
 
 // TODO get ina228 handle from pvparameters
 void log_telemetry(void *pvParameters)
@@ -30,6 +30,8 @@ void log_telemetry(void *pvParameters)
     solaris_telemetry_t record;
     xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY); // Wait for time sync to happen before allowing logging
     solaris_ina228_result_t result;
+    double sum = 0;
+    double avg = 0;
     while (1)
     {
         struct timeval tv;
@@ -38,26 +40,21 @@ void log_telemetry(void *pvParameters)
         // TODO get implementation to get the telemetry information
         uint8_t battery_level = 0, net_power_w = 0;
 
-        // xSemaphoreTake(mutex)
-        // ina228_handle;
-        // solaris_ina228_read(ina228_handle, &result);
-        // battery_level = (uint8_t)result.soc_percent;
-        // xSempahoreGive(mutex);
+        // Get state of charge of battery from the energy monitor unit
+        xSemaphoreTake(i2c_bus_mutex, portMAX_DELAY);
+        solaris_ina228_read(ina228_handle, &result);
+        xSemaphoreGive(i2c_bus_mutex);
+        battery_level = (uint8_t)result.soc_percent;
 
-        // xSemaphoreTake(mutex)
-        // grab average from buffer with moves
-        // net_power_w = avg_power
-        // xSemaphoreGive(mutex)
-
-        // TODO change current random power and SOC to real integration above
-        srand(time(NULL));
-
-        battery_level = (rand() % 100) + 1;
-        net_power_w = (rand() % 20) + 1;
-
-        record.distance_m = get_distance_traveled();
-        record.battery_percent = battery_level;
-        record.net_power_gain_w = net_power_w;
+        // Get the average net power gain / loss from last minute
+        xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);
+        for (int i = 0; i < 60; i++)
+        {
+            sum += solaris_power_buffer_with_moves_included[i];
+        }
+        xSemaphoreGive(solaris_power_buffer_with_moves_included);
+        avg = sum / 60;
+        net_power_w = avg;
 
         ESP_ERROR_CHECK(temperature_sensor_enable(temp_handle));
 

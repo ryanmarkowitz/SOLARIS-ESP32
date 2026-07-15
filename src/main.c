@@ -129,15 +129,15 @@ void app_main(void)
     xEventQueue = xQueueCreate(EVENT_QUEUE_LENGTH, sizeof(solaris_event_t));
 
     // IF YOU GET STACK OVERFLOW ERRORS CHANGE 4096 TO HIGHER NUMBER AS THIS IS THE STACK DEPTH ALLOCATION
-    xTaskCreatePinnedToCore(solar_tracking, "solar tracking", 4096, NULL, 13, &xSolarTracking, 1);
-    xTaskCreatePinnedToCore(driver_function, "driving function", 4096, NULL, 5, &xDriverFunction, 1);
+    xTaskCreatePinnedToCore(solar_tracking, "solar tracking", 4096, NULL, 20, &xSolarTracking, 1);
+    xTaskCreatePinnedToCore(driver_function, "driving function", 4096, NULL, 19, &xDriverFunction, 1);
     // xTaskCreatePinnedToCore(solaris_ina228_make_move_decision, "move decision function", 4096, NULL, 8, &xMoveDecision, 0);
-    // xTaskCreatePinnedToCore(solaris_ina228_1s_read, "energy read", 4096, ina228_handle, 7, NULL, 0);
+    xTaskCreatePinnedToCore(solaris_ina228_1s_read, "energy read", 4096, ina228_handle, 15, NULL, 0);
     // xTaskCreatePinnedToCore(imu_drive_task, "imu drive", 4096, NULL, 10, &xImuDrive, 1);
     // xTaskCreatePinnedToCore(imu_align_task, "imu align", 4096, NULL, 10, &xImuAlign, 1);
     // xTaskCreatePinnedToCore(ultrasonic_task, "ultrasonic", 4096, NULL, 15, &xUltrasonic, 1);
     // xTaskCreatePinnedToCore(imu_collision_task, "imu collision", 4096, NULL, 14, &xImuCollision, 0);
-    xTaskCreatePinnedToCore(log_telemetry, "logging telemetry to nvs", 4096, NULL, 4, NULL, 0);
+    xTaskCreatePinnedToCore(log_telemetry, "logging telemetry to nvs", 4096, NULL, 5, NULL, 0);
 
     // xTaskCreate(test_motor, "test motor", 4096, NULL, 15, NULL);
 }

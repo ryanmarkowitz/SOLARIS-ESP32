@@ -76,177 +76,176 @@ void driver_function(void *pvParameters)
         {
         case SOLARIS_MODE_AUTOMATIC:
             // // If we recieve a signal we should move
-            // if (xTaskNotifyWait(0x00, ULONG_MAX, &bits, 0) == pdTRUE)
-            // {
-            //     move_counter = 0;
-            //     // get what the median of the previous 3 minutes was to compare after moving
-            //     memcpy(&median_power_last_3m, &bits, sizeof(median_power_last_3m));
-            // start:
-            //     if (move_counter > 3)
-            //     {
-            //         solaris_mode_set_from_u8(0);
-            //         solaris_mode = solaris_mode_get();
-            //         goto done;
-            //     }
-            //     // Find direction to move in
-            //     solaris_pt_read(pt, result, false);
-            //     for (int i = 0; i < SOLARIS_PT_MAX_SENSORS / 2; i++)
-            //     {
-            //         if (max < result[i].mv)
-            //         {
-            //             max = result[i].mv;
-            //             max_idx = i;
-            //         }
-            //     }
+            if (xTaskNotifyWait(0x00, ULONG_MAX, &bits, 0) == pdTRUE)
+            {
+                move_counter = 0;
+                // get what the median of the previous 3 minutes was to compare after moving
+                memcpy(&median_power_last_3m, &bits, sizeof(median_power_last_3m));
+            start:
+                if (move_counter > 3)
+                {
+                    solaris_mode_set_from_u8(0);
+                    solaris_mode = solaris_mode_get();
+                    goto done;
+                }
+                // Find direction to move in
+                solaris_pt_read(pt, result, false);
+                for (int i = 0; i < SOLARIS_PT_MAX_SENSORS / 2; i++)
+                {
+                    if (max < result[i].mv)
+                    {
+                        max = result[i].mv;
+                        max_idx = i;
+                    }
+                }
 
-            //     // figure out from phototransistor array which direction to turn
-            //     if (max_idx == 0)
-            //     {
-            //         move_angle = 45;
-            //     }
-            //     else if (max_idx == 1)
-            //     {
-            //         move_angle = -45;
-            //     }
-            //     else if (max_idx == 2)
-            //     {
-            //         move_angle = 135;
-            //     }
-            //     else
-            //     {
-            //         move_angle = -135;
-            //     }
+                // figure out from phototransistor array which direction to turn
+                if (max_idx == 0)
+                {
+                    move_angle = 45;
+                }
+                else if (max_idx == 1)
+                {
+                    move_angle = -45;
+                }
+                else if (max_idx == 2)
+                {
+                    move_angle = 135;
+                }
+                else
+                {
+                    move_angle = -135;
+                }
 
-            //     // turn SOLARIS to the highest light level phototransistor
-            //     xSemaphoreTake(actuator_mutex, portMAX_DELAY);
-            //     motor_turn_degrees(imu_handle, move_angle);
-            //     xSemaphoreGive(actuator_mutex);
+                // turn SOLARIS to the highest light level phototransistor
+                xSemaphoreTake(actuator_mutex, portMAX_DELAY);
+                motor_turn_degrees(imu_handle, move_angle);
+                xSemaphoreGive(actuator_mutex);
 
-            //     // Drive straight for 3 seconds in the direction max_idx picked.
-            //     // imu_drive_task corrects for yaw drift using the gyro, and owns
-            //     // actuator_mutex for the duration of the drive.
-            //     xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
-            //     xTaskNotify(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
-            //     xTaskNotify(xImuCollision, IMU_COLLISION_TASK_START, eSetValueWithOverwrite);
+                // Drive straight for 3 seconds in the direction max_idx picked.
+                // imu_drive_task corrects for yaw drift using the gyro, and owns
+                // actuator_mutex for the duration of the drive.
+                xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                xTaskNotify(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
+                xTaskNotify(xImuCollision, IMU_COLLISION_TASK_START, eSetValueWithOverwrite);
 
-            //     // Wait up to 3 seconds while driving. xQueueReceive wakes up the
-            //     // instant anything arrives, so a mode switch, ultrasonic obstacle,
-            //     // or IMU collision all get handled immediately, not just at the 3s mark.
-            //     if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(3000)) == pdPASS)
-            //     {
-            //         xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
-            //         xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
-            //         xTaskNotify(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
+                // Wait up to 3 seconds while driving. xQueueReceive wakes up the
+                // instant anything arrives, so a mode switch, ultrasonic obstacle,
+                // or IMU collision all get handled immediately, not just at the 3s mark.
+                if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(3000)) == pdPASS)
+                {
+                    xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                    xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
+                    xTaskNotify(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
 
-            //         if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
-            //         {
-            //             solaris_mode = (solaris_mode_t)evt.mode;
-            //             goto done;
-            //         }
+                    if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
+                    {
+                        solaris_mode = (solaris_mode_t)evt.mode;
+                        goto done;
+                    }
 
-            //         // Ultrasonic obstacle or IMU collision: back up, turn away,
-            //         // and re-evaluate direction from the top.
-            //         if (evt.type == SOLARIS_EVENT_ULTRASONIC)
-            //         {
-            //             // wait 5 seconds before trying to move around the object.
-            //             if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(5000)) == pdPASS)
-            //             {
-            //                 if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
-            //                 {
-            //                     solaris_mode = (solaris_mode_t)evt.mode;
-            //                     goto done;
-            //                 }
-            //             }
+                    // Ultrasonic obstacle or IMU collision: back up, turn away,
+                    // and re-evaluate direction from the top.
+                    if (evt.type == SOLARIS_EVENT_ULTRASONIC)
+                    {
+                        // wait 5 seconds before trying to move around the object.
+                        if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(5000)) == pdPASS)
+                        {
+                            if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
+                            {
+                                solaris_mode = (solaris_mode_t)evt.mode;
+                                goto done;
+                            }
+                        }
 
-            //             //
-            //             xTaskNotify(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
-            //             if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(250)) == pdPASS)
-            //             {
-            //                 xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
-            //                 if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
-            //                 {
-            //                     solaris_mode = (solaris_mode_t)evt.mode;
-            //                     goto done;
-            //                 }
-            //                 // object is still detected
-            //                 else if (evt.type == SOLARIS_EVENT_ULTRASONIC)
-            //                 {
-            //                     // back up and turn in direction of best sunlight again
-            //                     xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
-            //                     vTaskDelay(pdMS_TO_TICKS(1000));
-            //                     xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
-            //                     move_counter++;
-            //                     goto start;
-            //                 }
-            //             }
+                        xTaskNotify(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
+                        if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(500)) == pdPASS)
+                        {
+                            xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
+                            if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
+                            {
+                                solaris_mode = (solaris_mode_t)evt.mode;
+                                goto done;
+                            }
+                            // object is still detected
+                            else if (evt.type == SOLARIS_EVENT_ULTRASONIC)
+                            {
+                                // back up and turn in direction of best sunlight again
+                                xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                                vTaskDelay(pdMS_TO_TICKS(1000));
+                                xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                                move_counter++;
+                                goto start;
+                            }
+                        }
 
-            //             ESP_LOGW(TAG, "ultrasonic obstacle: sensor=%d distance=%.1fin", evt.sensor_index, evt.distance_in);
-            //         }
-            //         else // SOLARIS_EVENT_IMU_COLLISION
-            //         {
-            //             xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
-            //             vTaskDelay(pdMS_TO_TICKS(1000));
-            //             xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
-            //             move_counter++;
-            //             goto start;
-            //             ESP_LOGW(TAG, "imu collision/stall detected");
-            //         }
-            //     }
+                        ESP_LOGW(TAG, "ultrasonic obstacle: sensor=%d distance=%.1fin", evt.sensor_index, evt.distance_in);
+                    }
+                    else // SOLARIS_EVENT_IMU_COLLISION
+                    {
+                        xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                        vTaskDelay(pdMS_TO_TICKS(1000));
+                        xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                        move_counter++;
+                        goto start;
+                        ESP_LOGW(TAG, "imu collision/stall detected");
+                    }
+                }
 
-            //     // Stop moving the motors
-            //     xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
-            //     xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
-            //     xTaskNotify(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
+                // Stop moving the motors
+                xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
+                xTaskNotify(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
 
-            //     // Reorient to face whichever of north/south is the shorter turn.
-            //     xTaskNotifyGive(xImuAlign);
+                // Reorient to face whichever of north/south is the shorter turn.
+                xTaskNotifyGive(xImuAlign);
 
-            //     // increment move_counter
-            //     move_counter++;
+                // increment move_counter
+                move_counter++;
 
-            //     // After reorientation, allow the panel to self adjust
-            //     xTaskNotifyGive(xSolarTracking);
+                // After reorientation, allow the panel to self adjust
+                xTaskNotifyGive(xSolarTracking);
 
-            //     // wait up to 30 seconds for the panel/power to settle. If we recieve mode change in this process, just change mode
-            //     if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(30000)) == pdPASS)
-            //     {
-            //         if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
-            //         {
-            //             solaris_mode = (solaris_mode_t)evt.mode;
-            //             goto done;
-            //         }
-            //     }
+                // wait up to 30 seconds for the panel/power to settle. If we recieve mode change in this process, just change mode
+                if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(30000)) == pdPASS)
+                {
+                    if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
+                    {
+                        solaris_mode = (solaris_mode_t)evt.mode;
+                        goto done;
+                    }
+                }
 
-            //     // Otherwise Check the new 30 second power gain compared to old previous 3m. If we made up the power stay put
-            //     // solaris_power_buffer/solaris_power_buffer_idx are written by solaris_ina228_1s_read under this
-            //     // same mutex, and solaris_windowed_median's internal scratch buffer isn't safe to enter from two
-            //     // tasks at once -- both reasons this must be held here too.
-            //     xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
-            //     median_power_last_30s = solaris_windowed_median(solaris_power_buffer, SOLARIS_RING_BUFFER_SIZE, solaris_power_buffer_idx, 30);
-            //     xSemaphoreGive(solaris_energy_monitor_resource);
-            //     if (median_power_last_30s * 1.05 < median_power_last_3m)
-            //     {
-            //         // We couldn't make up the power loss. If we haven't done 3 steps yet, try moving again
-            //         if (move_counter < 3)
-            //         {
-            //             goto start;
-            //         }
-            //         // We've moved 3 times already. Cut losses and move to stationary mode
-            //         else
-            //         {
-            //             // set the mode to stationary
-            //             solaris_mode_set_from_u8(0);
-            //             solaris_mode = solaris_mode_get();
-            //             goto done;
-            //         }
-            //     }
-            // }
+                // Otherwise Check the new 30 second power gain compared to old previous 3m. If we made up the power stay put
+                // solaris_power_buffer/solaris_power_buffer_idx are written by solaris_ina228_1s_read under this
+                // same mutex, and solaris_windowed_median's internal scratch buffer isn't safe to enter from two
+                // tasks at once -- both reasons this must be held here too.
+                xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
+                median_power_last_30s = solaris_windowed_median(solaris_power_buffer, SOLARIS_RING_BUFFER_SIZE, solaris_power_buffer_idx, 30);
+                xSemaphoreGive(solaris_energy_monitor_resource);
+                if (median_power_last_30s * 1.05 < median_power_last_3m)
+                {
+                    // We couldn't make up the power loss. If we haven't done 3 steps yet, try moving again
+                    if (move_counter < 3)
+                    {
+                        goto start;
+                    }
+                    // We've moved 3 times already. Cut losses and move to stationary mode
+                    else
+                    {
+                        // set the mode to stationary
+                        solaris_mode_set_from_u8(0);
+                        solaris_mode = solaris_mode_get();
+                        goto done;
+                    }
+                }
+            }
 
-            // // We didn't move, make sure solar panel doesn't need to reorient itself
-            // else
-            // {
-            //     xTaskNotifyGive(xSolarTracking);
-            // }
+            // We didn't move, make sure solar panel doesn't need to reorient itself
+            else
+            {
+                xTaskNotifyGive(xSolarTracking);
+            }
             break;
         case SOLARIS_MODE_MANUAL:;
             break;
@@ -254,10 +253,10 @@ void driver_function(void *pvParameters)
             xTaskNotifyGive(xSolarTracking);
             break;
         }
-        // Generic poll, runs regardless of mode. Only mode switches are acted on
-        // here -- ultrasonic/IMU events are just logged, since we don't know if
-        // we're actively driving right now (e.g. this also runs in manual mode).
-        // done:
+    // Generic poll, runs regardless of mode. Only mode switches are acted on
+    // here -- ultrasonic/IMU events are just logged, since we don't know if
+    // we're actively driving right now (e.g. this also runs in manual mode).
+    done:
         if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(250)) == pdPASS)
         {
             if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
@@ -418,14 +417,30 @@ void ultrasonic_task(void *pvParameters)
 
             if (solaris_us_read(us_handle, results) == ESP_OK)
             {
-                for (int i = 0; i < us_cfg.num_sensors; i++)
-                {
-                    if (results[i].inches <= ULTRASONIC_TRIGGER_IN)
+                int dir = gpio_get_level(42);
+                if (dir == 1)
+                // TODO MAP THE ULTRASONIC INDEXES CORRECTLY
+                { // motors are driving forward. Only check front two ultrasonics
+                    if (results[0].inches <= ULTRASONIC_TRIGGER_IN || results[1].inches <= ULTRASONIC_TRIGGER_IN)
                     {
+                        int idx = (results[0].inches < results[1].inches) ? 0 : 1;
                         solaris_event_t evt = {
                             .type = SOLARIS_EVENT_ULTRASONIC,
-                            .sensor_index = (uint8_t)i,
-                            .distance_in = results[i].inches,
+                            .sensor_index = (uint8_t)idx,
+                            .distance_in = results[idx].inches,
+                        };
+                        xQueueSend(xEventQueue, &evt, 0);
+                    }
+                }
+                else // motors are driving backward. Only check back two ultrasonics
+                {
+                    if (results[2].inches <= ULTRASONIC_TRIGGER_IN || results[3].inches <= ULTRASONIC_TRIGGER_IN)
+                    {
+                        int idx = (results[2].inches < results[3].inches) ? 2 : 3;
+                        solaris_event_t evt = {
+                            .type = SOLARIS_EVENT_ULTRASONIC,
+                            .sensor_index = (uint8_t)idx,
+                            .distance_in = results[idx].inches,
                         };
                         xQueueSend(xEventQueue, &evt, 0);
                     }

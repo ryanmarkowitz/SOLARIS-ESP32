@@ -22,6 +22,10 @@ extern TaskHandle_t xUltrasonic;
 extern TaskHandle_t xImuCollision;
 extern TaskHandle_t xTimeSynced;
 
+/* handles for reads */
+typedef struct solaris_ina228_ctx_t *solaris_ina228_handle_t;
+extern solaris_ina228_handle_t ina228_handle;
+
 /*
  * Events sent through xEventQueue. driver_function's blocking waits react
  * to all three the instant one arrives: a BLE mode switch, an ultrasonic-

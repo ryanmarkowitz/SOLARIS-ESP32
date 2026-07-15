@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include "esp_err.h"
 #include "driver/i2c.h"
+#include "shared_resources.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -121,9 +122,6 @@ extern "C"
     // ---------------------------------------------------------------------------
     // Handle
     // ---------------------------------------------------------------------------
-
-    /** Opaque handle returned by solaris_ina228_init(). */
-    typedef struct solaris_ina228_ctx_t *solaris_ina228_handle_t;
 
     // ---------------------------------------------------------------------------
     // Measurement result
