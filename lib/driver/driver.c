@@ -57,6 +57,24 @@ If after 3 steps we don't recieve power gains, cut losses. Don't let sunk cost b
 
 static volatile solaris_mode_t solaris_mode;
 
+// xImuDrive/xImuAlign/xUltrasonic/xImuCollision/xMoveDecision are only
+// assigned when their tasks are created in main.c. Several of those
+// xTaskCreatePinnedToCore calls are currently commented out, leaving the
+// handles NULL -- xTaskNotify/xTaskNotifyGive configASSERT on a NULL handle,
+// which aborts the whole firmware. Guard every notify the same way
+// gatt_svc.c already guards xTimeSynced.
+static inline void notify_if_valid(TaskHandle_t task, uint32_t value, eNotifyAction action)
+{
+    if (task != NULL)
+        xTaskNotify(task, value, action);
+}
+
+static inline void notify_give_if_valid(TaskHandle_t task)
+{
+    if (task != NULL)
+        xTaskNotifyGive(task);
+}
+
 void driver_function(void *pvParameters)
 {
     solaris_mode_set_from_u8(SOLARIS_MODE_MANUAL);
@@ -125,18 +143,18 @@ void driver_function(void *pvParameters)
                 // Drive straight for 3 seconds in the direction max_idx picked.
                 // imu_drive_task corrects for yaw drift using the gyro, and owns
                 // actuator_mutex for the duration of the drive.
-                xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
-                xTaskNotify(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
-                xTaskNotify(xImuCollision, IMU_COLLISION_TASK_START, eSetValueWithOverwrite);
+                notify_if_valid(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                notify_if_valid(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
+                notify_if_valid(xImuCollision, IMU_COLLISION_TASK_START, eSetValueWithOverwrite);
 
                 // Wait up to 3 seconds while driving. xQueueReceive wakes up the
                 // instant anything arrives, so a mode switch, ultrasonic obstacle,
                 // or IMU collision all get handled immediately, not just at the 3s mark.
                 if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(3000)) == pdPASS)
                 {
-                    xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
-                    xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
-                    xTaskNotify(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
+                    notify_if_valid(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                    notify_if_valid(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
+                    notify_if_valid(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
 
                     if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
                     {
@@ -158,10 +176,10 @@ void driver_function(void *pvParameters)
                             }
                         }
 
-                        xTaskNotify(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
+                        notify_if_valid(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
                         if (xQueueReceive(xEventQueue, &evt, pdMS_TO_TICKS(500)) == pdPASS)
                         {
-                            xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
+                            notify_if_valid(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
                             if (evt.type == SOLARIS_EVENT_MODE_CHANGE)
                             {
                                 solaris_mode = (solaris_mode_t)evt.mode;
@@ -171,9 +189,9 @@ void driver_function(void *pvParameters)
                             else if (evt.type == SOLARIS_EVENT_ULTRASONIC)
                             {
                                 // back up and turn in direction of best sunlight again
-                                xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                                notify_if_valid(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
                                 vTaskDelay(pdMS_TO_TICKS(1000));
-                                xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                                notify_if_valid(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
                                 move_counter++;
                                 goto start;
                             }
@@ -183,9 +201,9 @@ void driver_function(void *pvParameters)
                     }
                     else // SOLARIS_EVENT_IMU_COLLISION
                     {
-                        xTaskNotify(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                        notify_if_valid(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
                         vTaskDelay(pdMS_TO_TICKS(1000));
-                        xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                        notify_if_valid(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
                         move_counter++;
                         goto start;
                         ESP_LOGW(TAG, "imu collision/stall detected");
@@ -193,12 +211,12 @@ void driver_function(void *pvParameters)
                 }
 
                 // Stop moving the motors
-                xTaskNotify(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
-                xTaskNotify(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
-                xTaskNotify(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
+                notify_if_valid(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
+                notify_if_valid(xUltrasonic, ULTRASONIC_TASK_STOP, eSetValueWithOverwrite);
+                notify_if_valid(xImuCollision, IMU_COLLISION_TASK_STOP, eSetValueWithOverwrite);
 
                 // Reorient to face whichever of north/south is the shorter turn.
-                xTaskNotifyGive(xImuAlign);
+                notify_give_if_valid(xImuAlign);
 
                 // increment move_counter
                 move_counter++;

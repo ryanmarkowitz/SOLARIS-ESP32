@@ -38,4 +38,8 @@ bool solaris_telemetry_log_get_page(int page, solaris_telemetry_t *records_out,
                                     int *count_out);
 void solaris_telemetry_log_clear(void);
 
+/* Append one record to the in-RAM log and persist the whole log to NVS.
+ * Oldest record is dropped once SOLARIS_TELEMETRY_LOG_CAPACITY is reached. */
+void solaris_telemetry_log_append(const solaris_telemetry_t *record);
+
 #endif // SOLARIS_TELEMETRY_H

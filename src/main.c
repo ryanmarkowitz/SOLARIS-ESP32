@@ -137,7 +137,7 @@ void app_main(void)
     // xTaskCreatePinnedToCore(imu_align_task, "imu align", 4096, NULL, 10, &xImuAlign, 1);
     // xTaskCreatePinnedToCore(ultrasonic_task, "ultrasonic", 4096, NULL, 15, &xUltrasonic, 1);
     // xTaskCreatePinnedToCore(imu_collision_task, "imu collision", 4096, NULL, 14, &xImuCollision, 0);
-    xTaskCreatePinnedToCore(log_telemetry, "logging telemetry to nvs", 4096, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(log_telemetry, "logging telemetry to nvs", 4096, NULL, 5, &xTimeSynced, 0);
 
     // xTaskCreate(test_motor, "test motor", 4096, NULL, 15, NULL);
 }

@@ -18,7 +18,7 @@
 #define FORWARD_TARGET_TILT 350   // maps to +30 degrees
 #define BACKWARD_TARGET_TILT -350 // maps to -30 degrees
 
-#define PULSES_TO_360 2650
+#define PULSES_TO_360 810
 #define WHEEL_CIRCUMFERENCE_M .1016
 
 static int load_position_from_flash(uint8_t encoder_id);
@@ -38,7 +38,7 @@ FL encoder - Pin 35
 static const encoder_pins_t encoder_pins[NUM_ENCODERS] = {
     {.encoder_gpio = 37, .dir_gpio = 18},
     {.encoder_gpio = 35, .dir_gpio = 38},
-    {.encoder_gpio = 42, .dir_gpio = -1},
+    {.encoder_gpio = 45, .dir_gpio = -1},
 };
 
 /*
@@ -374,8 +374,10 @@ float get_distance_traveled()
     // This is just temp code for idea of where to go next
     int cur_drive_pulses;
     ESP_ERROR_CHECK(pcnt_unit_get_count(encoders[FL_ENCODER_ID].pcnt_unit, &cur_drive_pulses));
+    ESP_LOGI(TAG, "cur pulses: %d", cur_drive_pulses);
     float pulses_to_360 = (float)cur_drive_pulses / PULSES_TO_360;
-    float overflow_pulses_to_360 = (HIGH_LIMIT / pulses_to_360) * overflow_counter_FL;
+    float overflow_pulses_to_360 = (HIGH_LIMIT / PULSES_TO_360) * overflow_counter_FL;
+    ESP_LOGI(TAG, "overflow LEFT counter %d", overflow_counter_FL);
     float distance_traveled = overflow_pulses_to_360 * WHEEL_CIRCUMFERENCE_M;
     distance_traveled += pulses_to_360 * WHEEL_CIRCUMFERENCE_M;
 

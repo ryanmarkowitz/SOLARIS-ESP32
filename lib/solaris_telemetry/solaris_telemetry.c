@@ -119,6 +119,49 @@ bool solaris_telemetry_log_get_page(int page, solaris_telemetry_t *records_out,
     return true;
 }
 
+// Append a record to the log (RAM + NVS). Drops the oldest record once full
+// so a long-running log can't grow past SOLARIS_TELEMETRY_LOG_CAPACITY.
+void solaris_telemetry_log_append(const solaris_telemetry_t *record)
+{
+    if (!record)
+        return;
+
+    if (g_log_count < SOLARIS_TELEMETRY_LOG_CAPACITY)
+    {
+        g_log[g_log_count++] = *record;
+    }
+    else
+    {
+        memmove(&g_log[0], &g_log[1], (size_t)(SOLARIS_TELEMETRY_LOG_CAPACITY - 1) * sizeof(solaris_telemetry_t));
+        g_log[SOLARIS_TELEMETRY_LOG_CAPACITY - 1] = *record;
+    }
+
+    nvs_handle_t handle;
+    esp_err_t err = nvs_open(NVS_NS, NVS_READWRITE, &handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "nvs_open failed: %s", esp_err_to_name(err));
+        return;
+    }
+
+    err = nvs_set_i32(handle, NVS_KEY_CNT, g_log_count);
+    if (err == ESP_OK)
+    {
+        err = nvs_set_blob(handle, NVS_KEY_DATA, g_log, (size_t)g_log_count * sizeof(solaris_telemetry_t));
+    }
+    if (err == ESP_OK)
+    {
+        err = nvs_commit(handle);
+    }
+
+    if (err != ESP_OK)
+        ESP_LOGE(TAG, "failed to persist telemetry record: %s", esp_err_to_name(err));
+    else
+        ESP_LOGI(TAG, "persisted telemetry record (%d total)", g_log_count);
+
+    nvs_close(handle);
+}
+
 // Erase telemetry data
 void solaris_telemetry_log_clear(void)
 {

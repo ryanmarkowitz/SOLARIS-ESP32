@@ -505,7 +505,10 @@ void solaris_ina228_1s_read(void *pvParmaters)
             {
                 // after 3 minutes of information is filled, notify move decision task to fire
                 counter = 0;
-                xTaskNotifyGive(xMoveDecision);
+                // xMoveDecision is only set when its task is created in main.c, which is
+                // currently commented out -- xTaskNotifyGive configASSERTs on a NULL handle.
+                if (xMoveDecision != NULL)
+                    xTaskNotifyGive(xMoveDecision);
             }
         }
         else // Solaris is moving. In the event it is moving only add value to the with moves buffer
