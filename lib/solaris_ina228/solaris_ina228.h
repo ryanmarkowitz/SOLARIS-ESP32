@@ -87,8 +87,6 @@ extern "C"
 
         /* Battery */
         float battery_capacity_mah; /**< Battery capacity in mAh for SOC calculation. */
-        float battery_full_v;       /**< Voltage considered 100% SOC (e.g. 14.4V). */
-        float battery_empty_v;      /**< Voltage considered 0% SOC (e.g. 12.0V). */
     } solaris_ina228_config_t;
 
 /**
@@ -115,8 +113,6 @@ extern "C"
     .config_reg = 0x0010,                 \
     .adc_config_reg = 0xFB6A,             \
     .battery_capacity_mah = 5000.0f,      \
-    .battery_full_v = 14.4f,              \
-    .battery_empty_v = 12.0f,             \
 }
 
     // ---------------------------------------------------------------------------
@@ -140,7 +136,7 @@ extern "C"
         float charge_c;      /**< Accumulated charge in coulombs. */
         float charge_mah;    /**< Accumulated charge in milliamp-hours. */
         float temperature_c; /**< Die temperature in degrees Celsius. */
-        float soc_percent;   /**< Estimated state of charge (0–100%). */
+        uint8_t soc_percent; /**< Estimated state of charge (0–100%). */
     } solaris_ina228_result_t;
 
     // ---------------------------------------------------------------------------
@@ -201,8 +197,8 @@ extern "C"
     /**
      * @brief  Read state of charge estimate (0–100%).
      *
-     * Uses coulomb counting from the CHARGE register combined with
-     * voltage-based calibration at full/empty thresholds.
+     * Uses coulomb counting from the CHARGE register, anchored to the
+     * last SOC value persisted to flash (see set_soc()).
      *
      * @param[in]  handle       Handle returned by solaris_ina228_init().
      * @param[out] soc_percent  State of charge percentage.
@@ -210,7 +206,7 @@ extern "C"
      * @return ESP_OK on success.
      */
     esp_err_t solaris_ina228_read_soc(solaris_ina228_handle_t handle,
-                                      float *soc_percent);
+                                      uint8_t *soc_percent);
 
     /**
      * @brief  Reset the energy and charge accumulation registers.
@@ -255,6 +251,7 @@ extern "C"
 
     void solaris_ina228_1s_read(void *pvParmaters);
     void solaris_ina228_make_move_decision(void *pvParameters);
+    void set_soc(uint8_t soc);
 
 #ifdef __cplusplus
 }

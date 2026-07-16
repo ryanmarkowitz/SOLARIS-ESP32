@@ -37,14 +37,7 @@ void log_telemetry(void *pvParameters)
 
         // Get state of charge of battery from the energy monitor unit
         solaris_ina228_read(ina228_handle, &result);
-        if (result.current_ma == 0) // If no current is flowing then charge controller found the battery is fully charged.
-        {
-            battery_level = (uint8_t)100;
-        }
-        else
-        {
-            battery_level = (uint8_t)result.soc_percent;
-        }
+        battery_level = result.soc_percent;
 
         // Get the average net power gain / loss from last minute
         xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);

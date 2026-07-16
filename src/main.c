@@ -86,11 +86,17 @@ void app_main(void)
     // solaris_mock_data_seed(); // TODO: remove - seeds fake telemetry for testing
 
     // Uncomment to wipe saved pan/tilt position from flash before it's loaded in encoder_init()
-    // clear_position_from_flash(PAN_ENCODER_ID);
-    // clear_position_from_flash(TILT_ENCODER_ID);
+    clear_position_from_flash(PAN_ENCODER_ID);
+    clear_position_from_flash(TILT_ENCODER_ID);
 
     encoder_init();
     motor_init();
+
+    // Set the mosfet line high for the tilt and pan motors.
+    gpio_set_level(8, 1);
+
+    // manual rewrite of the SOC of battery. Only need to do once system should keep track after
+    set_soc(9);
 
     // Created before any I2C device init below -- INA228/ICM20948 init
     // themselves talk over I2C_NUM_0 and need this mutex to already exist.

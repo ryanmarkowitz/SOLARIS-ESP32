@@ -17,6 +17,10 @@
 #include <time.h>
 #include "shared_resources.h"
 #include <motor_driver.h>
+#include "nvs.h"
+
+#define NVS_NAMESPACE "SOC"
+#define NVS_KEY_SOC "SOC_PERCENT"
 
 static const char *TAG = "SOLARIS_INA228";
 
@@ -44,13 +48,54 @@ float solaris_power_buffer_with_moves_included[60];
 struct solaris_ina228_ctx_t
 {
     solaris_ina228_config_t cfg;
-    float initial_soc;
-    bool soc_initialized;
+    float last_charge_c;  // CHARGE register reading (coulombs) at the last SOC update
+    bool soc_initialized; // true once last_charge_c holds a real baseline
 };
 
 // ---------------------------------------------------------------------------
 // Private helpers — raw register I/O
 // ---------------------------------------------------------------------------
+
+static uint8_t load_soc()
+{
+    nvs_handle_t nvs_handle;
+    uint8_t soc = 0;
+
+    esp_err_t err;
+    err = nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs_handle);
+    if (err == ESP_ERR_NVS_NOT_FOUND)
+    {
+        ESP_LOGI(TAG, "NVS namespace not found");
+        nvs_close(nvs_handle);
+        return 0;
+    }
+    else if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Error opening NVS handle");
+        nvs_close(nvs_handle);
+        return 0;
+    }
+
+    err = nvs_get_u8(nvs_handle, NVS_KEY_SOC, &soc);
+    if (err == ESP_ERR_NVS_NOT_FOUND)
+    {
+        ESP_LOGI(TAG, "SOC not found in flash");
+        nvs_close(nvs_handle);
+        return 0;
+    }
+    else if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Error reading SOC from flash");
+        nvs_close(nvs_handle);
+        return 0;
+    }
+    else
+    {
+        ESP_LOGI(TAG, "SOC loaded from flash: %d", (int)soc);
+    }
+    nvs_close(nvs_handle);
+    return soc;
+}
 
 static esp_err_t prv_write_reg16(const struct solaris_ina228_ctx_t *ctx,
                                  uint8_t reg, uint16_t data)
@@ -130,24 +175,13 @@ static int32_t prv_sign_extend_20bit(uint32_t val)
     return (int32_t)val;
 }
 
-static float prv_calculate_soc(const struct solaris_ina228_ctx_t *ctx,
-                               float voltage_v, float charge_c)
+static uint8_t prv_calculate_soc(const struct solaris_ina228_ctx_t *ctx,
+                                 uint8_t cur_soc, float delta_c)
 {
-    // Voltage anchor — full charge resets SOC to 100%
-    if (voltage_v >= ctx->cfg.battery_full_v)
-    {
-        return 100.0f;
-    }
-    // Voltage anchor — empty resets SOC to 0%
-    if (voltage_v <= ctx->cfg.battery_empty_v)
-    {
-        return 0.0f;
-    }
-
-    // Coulomb counting
+    // Coulomb counting: apply the charge delta since the last update to the
+    // SOC value currently persisted in flash.
     float capacity_c = ctx->cfg.battery_capacity_mah * COULOMBS_PER_MAH;
-    float used_c = charge_c; // CHARGE register counts net coulombs
-    float soc = ctx->initial_soc - (used_c / capacity_c) * 100.0f;
+    float soc = (float)cur_soc - (delta_c / capacity_c) * 100.0f;
 
     // Clamp
     if (soc > 100.0f)
@@ -155,7 +189,21 @@ static float prv_calculate_soc(const struct solaris_ina228_ctx_t *ctx,
     if (soc < 0.0f)
         soc = 0.0f;
 
-    return soc;
+    return (uint8_t)(soc + 0.5f);
+}
+
+// Reads the current SOC from flash, applies the charge delta since the last
+// call, persists the result back to flash, and returns it.
+static uint8_t prv_update_soc(struct solaris_ina228_ctx_t *ctx, float charge_c)
+{
+    float delta_c = ctx->soc_initialized ? (charge_c - ctx->last_charge_c) : charge_c;
+    ctx->last_charge_c = charge_c;
+    ctx->soc_initialized = true;
+
+    uint8_t cur_soc = load_soc();
+    uint8_t new_soc = prv_calculate_soc(ctx, cur_soc, delta_c);
+    set_soc(new_soc);
+    return new_soc;
 }
 
 // ---------------------------------------------------------------------------
@@ -173,7 +221,6 @@ esp_err_t solaris_ina228_init(const solaris_ina228_config_t *config,
         return ESP_ERR_NO_MEM;
 
     ctx->cfg = *config;
-    ctx->initial_soc = 100.0f;
     ctx->soc_initialized = false;
     esp_err_t err;
 
@@ -237,40 +284,21 @@ esp_err_t solaris_ina228_read_current(solaris_ina228_handle_t handle,
 // ---------------------------------------------------------------------------
 
 esp_err_t solaris_ina228_read_soc(solaris_ina228_handle_t handle,
-                                  float *soc_percent)
+                                  uint8_t *soc_percent)
 {
     if (!handle || !soc_percent)
         return ESP_ERR_INVALID_ARG;
 
-    float voltage_v = 0.0f;
-    esp_err_t err = solaris_ina228_read_voltage(handle, &voltage_v);
-    if (err != ESP_OK)
-        return err;
-
     // Read CHARGE register (40-bit)
     uint64_t raw_charge = 0;
-    err = prv_read_reg40(handle, INA228_REG_CHARGE, &raw_charge);
+    esp_err_t err = prv_read_reg40(handle, INA228_REG_CHARGE, &raw_charge);
     if (err != ESP_OK)
         return err;
 
     // Charge LSB = CURRENT_LSB coulombs
     float charge_c = (float)(int64_t)raw_charge * handle->cfg.current_lsb;
 
-    // On first SOC read, anchor initial SOC to voltage
-    if (!handle->soc_initialized)
-    {
-        float range = handle->cfg.battery_full_v - handle->cfg.battery_empty_v;
-        float clamped = voltage_v;
-        if (clamped > handle->cfg.battery_full_v)
-            clamped = handle->cfg.battery_full_v;
-        if (clamped < handle->cfg.battery_empty_v)
-            clamped = handle->cfg.battery_empty_v;
-        handle->initial_soc = ((clamped - handle->cfg.battery_empty_v) / range) * 100.0f;
-        handle->soc_initialized = true;
-        ESP_LOGI(TAG, "SOC initialised from voltage: %.1f%%", handle->initial_soc);
-    }
-
-    *soc_percent = prv_calculate_soc(handle, voltage_v, charge_c);
+    *soc_percent = prv_update_soc(handle, charge_c);
     return ESP_OK;
 }
 
@@ -331,19 +359,7 @@ esp_err_t solaris_ina228_read(solaris_ina228_handle_t handle,
     result->temperature_c = (float)(int16_t)raw_temp * INA228_TEMP_LSB_C;
 
     // SOC
-    if (!handle->soc_initialized)
-    {
-        float range = handle->cfg.battery_full_v - handle->cfg.battery_empty_v;
-        float clamped = result->voltage_v;
-        if (clamped > handle->cfg.battery_full_v)
-            clamped = handle->cfg.battery_full_v;
-        if (clamped < handle->cfg.battery_empty_v)
-            clamped = handle->cfg.battery_empty_v;
-        handle->initial_soc = ((clamped - handle->cfg.battery_empty_v) / range) * 100.0f;
-        handle->soc_initialized = true;
-        ESP_LOGI(TAG, "SOC initialised from voltage: %.1f%%", handle->initial_soc);
-    }
-    result->soc_percent = prv_calculate_soc(handle, result->voltage_v, result->charge_c);
+    result->soc_percent = prv_update_soc(handle, result->charge_c);
 
     return ESP_OK;
 }
@@ -377,11 +393,11 @@ void solaris_ina228_log(solaris_ina228_handle_t handle,
         return;
 
     ESP_LOGI(TAG, "V: %6.3fV | I: %8.4fA (%7.2fmA) | P: %6.4fW | "
-                  "SOC: %5.1f%% | Temp: %.1f°C | Charge: %.2fmAh | Energy: %.4fJ",
+                  "SOC: %3u%% | Temp: %.1f°C | Charge: %.2fmAh | Energy: %.4fJ",
              result->voltage_v,
              result->current_a, result->current_ma,
              result->power_w,
-             result->soc_percent,
+             (unsigned int)result->soc_percent,
              result->temperature_c,
              result->charge_mah,
              result->energy_j);
@@ -395,11 +411,11 @@ void solaris_ina228_print_teleplot(solaris_ina228_handle_t handle,
     if (!handle || !result)
         return;
 
-    printf(">V:%.3f >I:%.4f >P:%.4f >SOC:%.1f >T:%.1f\n",
+    printf(">V:%.3f >I:%.4f >P:%.4f >SOC:%u >T:%.1f\n",
            result->voltage_v,
            result->current_a,
            result->power_w,
-           result->soc_percent,
+           (unsigned int)result->soc_percent,
            result->temperature_c);
 }
 
@@ -524,4 +540,37 @@ void solaris_ina228_1s_read(void *pvParmaters)
 
         vTaskDelayUntil(&last, pdMS_TO_TICKS(1000));
     }
+}
+
+void set_soc(uint8_t soc)
+{
+    // NVS manual get soc from main and store soc value in nvs
+
+    nvs_handle_t nvs_handle;
+    esp_err_t err;
+
+    // open NVS handle with SOC namespace
+    err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Error opening NVS handle");
+        goto done;
+    }
+
+    // write the soc to flash
+    err = nvs_set_u8(nvs_handle, NVS_KEY_SOC, soc);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Error writing to NVS");
+        goto done;
+    }
+
+    err = nvs_commit(nvs_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Error committing to NVS");
+    }
+
+done:
+    nvs_close(nvs_handle);
 }
