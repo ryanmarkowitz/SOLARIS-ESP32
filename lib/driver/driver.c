@@ -25,7 +25,7 @@
 #define RAD2DEG 57.29577951308232f
 
 #define ULTRASONIC_POLL_MS 250
-#define ULTRASONIC_TRIGGER_IN 12.0f
+#define ULTRASONIC_TRIGGER_IN 10.0f
 
 #define IMU_COLLISION_POLL_MS 250
 // ICM-20948 default accel full-scale is +/-2g -> 16384 LSB per g (matches
@@ -122,11 +122,11 @@ void driver_function(void *pvParameters)
                 {
                     move_angle = 45;
                 }
-                else if (max_idx == 1)
+                else if (max_idx == 3)
                 {
                     move_angle = -45;
                 }
-                else if (max_idx == 2)
+                else if (max_idx == 1)
                 {
                     move_angle = 135;
                 }
@@ -439,9 +439,9 @@ void ultrasonic_task(void *pvParameters)
                 if (dir == 1)
                 // TODO MAP THE ULTRASONIC INDEXES CORRECTLY
                 { // motors are driving forward. Only check front two ultrasonics
-                    if (results[0].inches <= ULTRASONIC_TRIGGER_IN || results[1].inches <= ULTRASONIC_TRIGGER_IN)
+                    if (results[1].inches <= ULTRASONIC_TRIGGER_IN || results[3].inches <= ULTRASONIC_TRIGGER_IN)
                     {
-                        int idx = (results[0].inches < results[1].inches) ? 0 : 1;
+                        int idx = (results[1].inches < results[3].inches) ? 1 : 3;
                         solaris_event_t evt = {
                             .type = SOLARIS_EVENT_ULTRASONIC,
                             .sensor_index = (uint8_t)idx,
@@ -452,9 +452,9 @@ void ultrasonic_task(void *pvParameters)
                 }
                 else // motors are driving backward. Only check back two ultrasonics
                 {
-                    if (results[2].inches <= ULTRASONIC_TRIGGER_IN || results[3].inches <= ULTRASONIC_TRIGGER_IN)
+                    if (results[0].inches <= ULTRASONIC_TRIGGER_IN || results[2].inches <= ULTRASONIC_TRIGGER_IN)
                     {
-                        int idx = (results[2].inches < results[3].inches) ? 2 : 3;
+                        int idx = (results[0].inches < results[2].inches) ? 0 : 2;
                         solaris_event_t evt = {
                             .type = SOLARIS_EVENT_ULTRASONIC,
                             .sensor_index = (uint8_t)idx,

@@ -29,7 +29,7 @@ MOTOR 3 - RIGHT DRIVE MOTOR
 static const motor_pins_t motor_pins[NUM_MOTORS] = {
     {.pwm_gpio = 17, .dir_gpio = 18},
     {.pwm_gpio = 21, .dir_gpio = 38},
-    {.pwm_gpio = 4, .dir_gpio = 42},
+    {.pwm_gpio = 4, .dir_gpio = 8},
     {.pwm_gpio = 6, .dir_gpio = 9}};
 
 static motor_t motors[NUM_MOTORS];
@@ -214,13 +214,21 @@ void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees)
 
 void test_motor(void *pvParameters)
 {
+    solaris_icm20948_handle_t handle = (solaris_icm20948_handle_t)pvParameters;
     int pulse_count;
     while (1)
     {
 
-        stop_motor(MOTOR_TILT_ID);
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        motor_go_forward(MOTOR_TILT_ID, .15);
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        stop_motor(MOTOR_LEFT_ID);
+        stop_motor(MOTOR_RIGHT_ID);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        motor_turn_degrees(handle, 45);
+        vTaskDelay(pdMS_TO_TICKS(-45));
+        motor_turn_degrees(handle, 45);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        motor_turn_degrees(handle, 135);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        motor_turn_degrees(handle, -135);
+        vTaskDelay(pdTICKS_TO_MS(3000));
     }
 }
