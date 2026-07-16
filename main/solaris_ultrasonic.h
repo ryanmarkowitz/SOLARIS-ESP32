@@ -89,7 +89,7 @@ extern "C"
     .vcc_mv = 5000,                        \
     .ranging_cycle_ms = 49,                \
     .settle_cycles = 3,                    \
-    .mux_settle_us = 180,                  \
+    .mux_settle_us = 250,                  \
     .free_run = false,                     \
 }
 
