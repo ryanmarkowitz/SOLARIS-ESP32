@@ -29,6 +29,7 @@ SemaphoreHandle_t solaris_energy_monitor_resource = NULL;
 SemaphoreHandle_t solaris_energy_monitor_resource_with_moves = NULL;
 SemaphoreHandle_t i2c_bus_mutex = NULL;
 SemaphoreHandle_t pt_bus_mutex = NULL;
+SemaphoreHandle_t encoder_mutex = NULL;
 QueueHandle_t xEventQueue = NULL;
 TaskHandle_t xSolarTracking = NULL;
 TaskHandle_t xDriverFunction = NULL;
@@ -93,15 +94,18 @@ void app_main(void)
     motor_init();
 
     // Set the mosfet line high for the tilt and pan motors.
-    gpio_set_level(8, 1);
+    gpio_reset_pin(15);
+    gpio_set_direction(15, GPIO_MODE_OUTPUT);
+    gpio_set_level(15, 1);
 
     // manual rewrite of the SOC of battery. Only need to do once system should keep track after
-    set_soc(9);
+    // set_soc(40);
 
     // Created before any I2C device init below -- INA228/ICM20948 init
     // themselves talk over I2C_NUM_0 and need this mutex to already exist.
     i2c_bus_mutex = xSemaphoreCreateMutex();
     pt_bus_mutex = xSemaphoreCreateMutex();
+    encoder_mutex = xSemaphoreCreateMutex();
     solaris_energy_monitor_resource_with_moves = xSemaphoreCreateMutex();
 
     // initialize the phototransistors
@@ -135,15 +139,15 @@ void app_main(void)
     xEventQueue = xQueueCreate(EVENT_QUEUE_LENGTH, sizeof(solaris_event_t));
 
     // IF YOU GET STACK OVERFLOW ERRORS CHANGE 4096 TO HIGHER NUMBER AS THIS IS THE STACK DEPTH ALLOCATION
-    // xTaskCreatePinnedToCore(solar_tracking, "solar tracking", 4096, NULL, 20, &xSolarTracking, 1);
-    // xTaskCreatePinnedToCore(driver_function, "driving function", 4096, NULL, 19, &xDriverFunction, 1);
-    // // xTaskCreatePinnedToCore(solaris_ina228_make_move_decision, "move decision function", 4096, ina228_handle, 8, &xMoveDecision, 0);
-    // xTaskCreatePinnedToCore(solaris_ina228_1s_read, "energy read", 4096, ina228_handle, 15, NULL, 0);
-    // // xTaskCreatePinnedToCore(imu_drive_task, "imu drive", 4096, NULL, 10, &xImuDrive, 1);
-    // // xTaskCreatePinnedToCore(imu_align_task, "imu align", 4096, NULL, 10, &xImuAlign, 1);
-    // // xTaskCreatePinnedToCore(ultrasonic_task, "ultrasonic", 4096, NULL, 15, &xUltrasonic, 1);
-    // // xTaskCreatePinnedToCore(imu_collision_task, "imu collision", 4096, NULL, 14, &xImuCollision, 0);
-    // xTaskCreatePinnedToCore(log_telemetry, "logging telemetry to nvs", 4096, NULL, 5, &xTimeSynced, 0);
+    xTaskCreatePinnedToCore(solar_tracking, "solar tracking", 4096, NULL, 20, &xSolarTracking, 1);
+    xTaskCreatePinnedToCore(driver_function, "driving function", 4096, NULL, 19, &xDriverFunction, 1);
+    xTaskCreatePinnedToCore(solaris_ina228_make_move_decision, "move decision function", 4096, ina228_handle, 8, &xMoveDecision, 0);
+    xTaskCreatePinnedToCore(solaris_ina228_1s_read, "energy read", 4096, ina228_handle, 15, NULL, 0);
+    xTaskCreatePinnedToCore(imu_drive_task, "imu drive", 4096, NULL, 10, &xImuDrive, 1);
+    xTaskCreatePinnedToCore(imu_align_task, "imu align", 4096, NULL, 10, &xImuAlign, 1);
+    xTaskCreatePinnedToCore(ultrasonic_task, "ultrasonic", 4096, NULL, 15, &xUltrasonic, 1);
+    xTaskCreatePinnedToCore(imu_collision_task, "imu collision", 4096, NULL, 14, &xImuCollision, 0);
+    xTaskCreatePinnedToCore(log_telemetry, "logging telemetry to nvs", 4096, NULL, 5, &xTimeSynced, 0);
 
-    xTaskCreate(test_motor, "test motor", 4096, imu_handle, 15, NULL);
+    // xTaskCreate(test_motor, "test motor", 4096, imu_handle, 15, NULL);
 }

@@ -10,7 +10,7 @@
 #include <stdint.h>
 
 #define SOLARIS_WEATHER_FORECAST_HOURS 24
-#define CLOUD_COVERAGE_PERCENTAGE_DECISION 80
+#define CLOUD_COVERAGE_PERCENTAGE_DECISION 110
 
 /*
  * BLE write payload layout (152 bytes, all little-endian):

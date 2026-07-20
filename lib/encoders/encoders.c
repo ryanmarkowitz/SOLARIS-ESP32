@@ -85,48 +85,45 @@ static void encoder_handler(void *param)
     while (1)
     {
         // wait for queue to be sent from on_encoder_limit_reached ISR
-        if (xQueueReceive(encoder_queue, &evt, portMAX_DELAY))
-            ESP_LOGI(TAG, "ISR Triggered");
-        ESP_LOGI(TAG, "evt id: %d", evt.id);
-        ESP_LOGI(TAG, "evt dir %d", evt.dir_level);
-        ESP_LOGI(TAG, "evt watch point %d", evt.watch_point_value);
+        xQueueReceive(encoder_queue, &evt, portMAX_DELAY);
+
+        // Act first, log after: ESP_LOGI() blocks on UART TX (a few ms per
+        // line), and stacking several of those calls ahead of stop_motor()
+        // let the motor keep coasting under full PWM for the whole time
+        // logging took, well past the watchpoint it already crossed.
+        switch (evt.id)
         {
-            switch (evt.id)
+        case PAN_ENCODER_ID:
+            if (evt.watch_point_value >= forward_max_position && (evt.dir_level == 0))
             {
-            case PAN_ENCODER_ID:
-                ESP_LOGI(TAG, "Watchpoint reached for pan motor: %d", evt.watch_point_value);
-                if (evt.watch_point_value >= forward_max_position && (evt.dir_level == 0))
-                {
-                    stop_motor(MOTOR_PAN_ID);
-                    panel_set_limit_state(PANEL_PAN_ID, PANEL_AT_UPPER_LIMIT);
-                    ESP_LOGI(TAG, "Pan panel at upper limit");
-                }
-                else if (evt.watch_point_value <= backward_max_position && (evt.dir_level == 1))
-                {
-                    stop_motor(MOTOR_PAN_ID);
-                    panel_set_limit_state(PANEL_PAN_ID, PANEL_AT_LOWER_LIMIT);
-                    ESP_LOGI(TAG, "Pan panel at lower limit");
-                }
-                break;
-            case TILT_ENCODER_ID:
-                ESP_LOGI(TAG, "Watchpoint reached for tilt motor: %d", evt.watch_point_value);
-                if (evt.watch_point_value >= forward_max_position && (evt.dir_level == 0))
-                {
-                    stop_motor(MOTOR_TILT_ID);
-                    panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_UPPER_LIMIT);
-                    ESP_LOGI(TAG, "Tilt panel at upper limit");
-                }
-                else if (evt.watch_point_value <= backward_max_position && (evt.dir_level == 1))
-                {
-                    stop_motor(MOTOR_TILT_ID);
-                    panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_LOWER_LIMIT);
-                    ESP_LOGI(TAG, "Tilt panel at lower limit");
-                }
-                break;
-            case FL_ENCODER_ID:
-                ESP_LOGI(TAG, "Overflow reached for FL encoder. At overflow #%d", ++overflow_counter_FL);
-                break;
+                panel_set_limit_state(PANEL_PAN_ID, PANEL_AT_UPPER_LIMIT);
+                stop_motor(MOTOR_PAN_ID);
+                ESP_LOGI(TAG, "Pan panel at upper limit (watchpoint %d)", evt.watch_point_value);
             }
+            else if (evt.watch_point_value <= backward_max_position && (evt.dir_level == 1))
+            {
+                panel_set_limit_state(PANEL_PAN_ID, PANEL_AT_LOWER_LIMIT);
+                stop_motor(MOTOR_PAN_ID);
+                ESP_LOGI(TAG, "Pan panel at lower limit (watchpoint %d)", evt.watch_point_value);
+            }
+            break;
+        case TILT_ENCODER_ID:
+            if (evt.watch_point_value >= forward_max_position && (evt.dir_level == 0))
+            {
+                panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_UPPER_LIMIT);
+                stop_motor(MOTOR_TILT_ID);
+                ESP_LOGI(TAG, "Tilt panel at upper limit (watchpoint %d)", evt.watch_point_value);
+            }
+            else if (evt.watch_point_value <= backward_max_position && (evt.dir_level == 1))
+            {
+                panel_set_limit_state(PANEL_TILT_ID, PANEL_AT_LOWER_LIMIT);
+                stop_motor(MOTOR_TILT_ID);
+                ESP_LOGI(TAG, "Tilt panel at lower limit (watchpoint %d)", evt.watch_point_value);
+            }
+            break;
+        case FL_ENCODER_ID:
+            ESP_LOGI(TAG, "Overflow reached for FL encoder. At overflow #%d", ++overflow_counter_FL);
+            break;
         }
     }
 }
@@ -384,9 +381,8 @@ float get_distance_traveled()
     // set overflows back to 0 so we can calculate distnace traveled next time
     overflow_counter_FL = 0;
 
-    // set counters in PCNT to 0 so we don't overcount in next call
-    ESP_ERROR_CHECK(pcnt_unit_clear_count(encoders[PAN_ENCODER_ID].pcnt_unit));
-    ESP_ERROR_CHECK(pcnt_unit_clear_count(encoders[TILT_ENCODER_ID].pcnt_unit));
+    // set counter back to 0 so we don't overcount in next call
+    ESP_ERROR_CHECK(pcnt_unit_clear_count(encoders[FL_ENCODER_ID].pcnt_unit));
 
     return distance_traveled;
 }

@@ -10,6 +10,7 @@ extern SemaphoreHandle_t solaris_energy_monitor_resource;
 extern SemaphoreHandle_t solaris_energy_monitor_resource_with_moves;
 extern SemaphoreHandle_t i2c_bus_mutex; // INA228 and ICM20948 share I2C_NUM_0 -- serializes every bus transaction between them
 extern SemaphoreHandle_t pt_bus_mutex;  // solar_tracking and driver_function both call solaris_pt_read() on the same mux-select GPIOs + ADC channel
+extern SemaphoreHandle_t encoder_mutex; // when changing the solar panel state or reading solar panel state we need to get a lock
 
 /* Handles for Queues and Task notification */
 extern QueueHandle_t xEventQueue;

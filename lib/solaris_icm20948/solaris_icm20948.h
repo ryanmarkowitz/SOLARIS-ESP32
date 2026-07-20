@@ -119,6 +119,20 @@ extern "C"
                                     solaris_icm20948_result_t *result);
 
     /**
+     * @brief  Re-zero the gyro bias using fresh stationary samples.
+     *
+     * Call immediately before a maneuver that integrates gyro readings
+     * (e.g. motor_turn_degrees), while the chassis is still stationary, to
+     * correct for bias drift since solaris_icm20948_init() (or the last
+     * recalibration) ran. Updates the bias applied by every subsequent
+     * solaris_icm20948_read() call.
+     *
+     * @param[in]  handle       Handle returned by solaris_icm20948_init().
+     * @param[in]  num_samples  Number of samples to average (~10ms apart).
+     */
+    void solaris_icm20948_recalibrate_gyro(solaris_icm20948_handle_t handle, int num_samples);
+
+    /**
      * @brief  Log the 6-DoF results at INFO level.
      *
      * @param[in]  result  Result populated by solaris_icm20948_read().

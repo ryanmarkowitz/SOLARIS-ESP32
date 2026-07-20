@@ -27,6 +27,8 @@
 #define ULTRASONIC_POLL_MS 250
 #define ULTRASONIC_TRIGGER_IN 10.0f
 
+#define STATIONARY_SETTLE_INTERVAL_MS 30000
+
 #define IMU_COLLISION_POLL_MS 250
 // ICM-20948 default accel full-scale is +/-2g -> 16384 LSB per g (matches
 // the gyro assumption: solaris_icm20948_init() never touches ACCEL_CONFIG).
@@ -88,6 +90,9 @@ void driver_function(void *pvParameters)
     int max_idx;
     int move_angle;
     solaris_event_t evt;
+    // Backdated so the first pass through SOLARIS_MODE_STATIONARY below fires
+    // a settle check immediately instead of waiting a full 30s.
+    TickType_t last_stationary_settle = xTaskGetTickCount() - pdMS_TO_TICKS(STATIONARY_SETTLE_INTERVAL_MS);
     while (1)
     {
         switch (solaris_mode)
@@ -106,7 +111,10 @@ void driver_function(void *pvParameters)
                     solaris_mode = solaris_mode_get();
                     goto done;
                 }
-                // Find direction to move in
+                // Find direction to move in. Reset max/max_idx each time through --
+                // otherwise a stale max from a previous pass (or retry) can keep
+                // the new scan from ever picking a new direction.
+                max = 0;
                 solaris_pt_read(pt, result, false);
                 for (int i = 0; i < SOLARIS_PT_MAX_SENSORS / 2; i++)
                 {
@@ -174,6 +182,14 @@ void driver_function(void *pvParameters)
                                 solaris_mode = (solaris_mode_t)evt.mode;
                                 goto done;
                             }
+                            // imu_collision_task hadn't fully honored its stop notification yet
+                            // and still caught a collision/stall while we sat here -- don't drop it.
+                            else if (evt.type == SOLARIS_EVENT_IMU_COLLISION)
+                            {
+                                ESP_LOGW(TAG, "imu collision/stall detected while backing off from ultrasonic obstacle");
+                                move_counter++;
+                                goto start;
+                            }
                         }
 
                         notify_if_valid(xUltrasonic, ULTRASONIC_TASK_START, eSetValueWithOverwrite);
@@ -185,11 +201,17 @@ void driver_function(void *pvParameters)
                                 solaris_mode = (solaris_mode_t)evt.mode;
                                 goto done;
                             }
+                            else if (evt.type == SOLARIS_EVENT_IMU_COLLISION)
+                            {
+                                ESP_LOGW(TAG, "imu collision/stall detected while backing off from ultrasonic obstacle");
+                                move_counter++;
+                                goto start;
+                            }
                             // object is still detected
                             else if (evt.type == SOLARIS_EVENT_ULTRASONIC)
                             {
-                                // back up and turn in direction of best sunlight again
-                                notify_if_valid(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                                // back away from the object and re-evaluate direction from the top
+                                notify_if_valid(xImuDrive, max_idx < 2 ? IMU_DRIVE_BACKWARD : IMU_DRIVE_FORWARD, eSetValueWithOverwrite);
                                 vTaskDelay(pdMS_TO_TICKS(1000));
                                 notify_if_valid(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
                                 move_counter++;
@@ -201,12 +223,13 @@ void driver_function(void *pvParameters)
                     }
                     else // SOLARIS_EVENT_IMU_COLLISION
                     {
-                        notify_if_valid(xImuDrive, max_idx < 2 ? IMU_DRIVE_FORWARD : IMU_DRIVE_BACKWARD, eSetValueWithOverwrite);
+                        ESP_LOGW(TAG, "imu collision/stall detected");
+                        // back away from whatever we hit/stalled against
+                        notify_if_valid(xImuDrive, max_idx < 2 ? IMU_DRIVE_BACKWARD : IMU_DRIVE_FORWARD, eSetValueWithOverwrite);
                         vTaskDelay(pdMS_TO_TICKS(1000));
                         notify_if_valid(xImuDrive, IMU_DRIVE_STOP, eSetValueWithOverwrite);
                         move_counter++;
                         goto start;
-                        ESP_LOGW(TAG, "imu collision/stall detected");
                     }
                 }
 
@@ -234,6 +257,8 @@ void driver_function(void *pvParameters)
                     }
                 }
 
+                ESP_LOGI(TAG, "Reached back into main");
+
                 // Otherwise Check the new 30 second power gain compared to old previous 3m. If we made up the power stay put
                 // solaris_power_buffer/solaris_power_buffer_idx are written by solaris_ina228_1s_read under this
                 // same mutex, and solaris_windowed_median's internal scratch buffer isn't safe to enter from two
@@ -241,7 +266,13 @@ void driver_function(void *pvParameters)
                 xSemaphoreTake(solaris_energy_monitor_resource, portMAX_DELAY);
                 median_power_last_30s = solaris_windowed_median(solaris_power_buffer, SOLARIS_RING_BUFFER_SIZE, solaris_power_buffer_idx, 30);
                 xSemaphoreGive(solaris_energy_monitor_resource);
-                if (median_power_last_30s * 1.05 < median_power_last_3m)
+                // median_power_last_3m can be negative (still net charging, just less than
+                // before) or positive (net discharging) -- the 5% comparison flips direction
+                // depending on which side of zero the baseline sits on.
+                bool power_still_down = (median_power_last_3m >= 0)
+                                             ? (median_power_last_30s * 1.05 < median_power_last_3m)
+                                             : (median_power_last_30s * 1.05 > median_power_last_3m);
+                if (power_still_down)
                 {
                     // We couldn't make up the power loss. If we haven't done 3 steps yet, try moving again
                     if (move_counter < 3)
@@ -259,16 +290,25 @@ void driver_function(void *pvParameters)
                 }
             }
 
-            // We didn't move, make sure solar panel doesn't need to reorient itself
-            else
-            {
-                xTaskNotifyGive(xSolarTracking);
-            }
+            // We didn't move -- nothing to do here. Panel realignment is
+            // triggered once on entering Automatic mode and once per completed
+            // move (below), not on every idle poll -- notifying every ~250ms
+            // regardless of whether the panel needs it kept solar_tracking_task
+            // re-taking actuator_mutex back-to-back, starving other tasks
+            // (e.g. the INA228 1s energy read) of the mutex.
             break;
         case SOLARIS_MODE_MANUAL:;
             break;
         case SOLARIS_MODE_STATIONARY:
-            xTaskNotifyGive(xSolarTracking);
+            // Re-settle the panel periodically even while parked, rather than
+            // on every ~250ms pass through this loop -- notifying that often
+            // kept solar_tracking_task re-taking actuator_mutex back-to-back,
+            // starving other tasks (e.g. the INA228 1s energy read) of it.
+            if (xTaskGetTickCount() - last_stationary_settle >= pdMS_TO_TICKS(STATIONARY_SETTLE_INTERVAL_MS))
+            {
+                last_stationary_settle = xTaskGetTickCount();
+                xTaskNotifyGive(xSolarTracking);
+            }
             break;
         }
     // Generic poll, runs regardless of mode. Only mode switches are acted on
@@ -281,6 +321,17 @@ void driver_function(void *pvParameters)
             {
                 solaris_mode = (solaris_mode_t)evt.mode;
                 ESP_LOGI(TAG, "mode changed %s", solaris_mode_to_str(solaris_mode));
+                // Give the panel one chance to reorient on entering Automatic --
+                // subsequent adjustments only happen after an actual move (above).
+                if (solaris_mode == SOLARIS_MODE_AUTOMATIC)
+                    xTaskNotifyGive(xSolarTracking);
+                // Force the SOLARIS_MODE_STATIONARY case below to treat this as
+                // overdue, so entering Stationary always settles immediately
+                // rather than waiting out whatever was left of the previous
+                // 30s window (e.g. if we were in Stationary recently before
+                // switching away and back).
+                else if (solaris_mode == SOLARIS_MODE_STATIONARY)
+                    last_stationary_settle = xTaskGetTickCount() - pdMS_TO_TICKS(STATIONARY_SETTLE_INTERVAL_MS);
             }
         }
     }
@@ -306,8 +357,13 @@ void imu_drive_task(void *pvParameters)
 
         while (1)
         {
-            uint32_t stop_cmd;
-            if (xTaskNotifyWait(0x00, ULONG_MAX, &stop_cmd, 0) == pdTRUE && stop_cmd == IMU_DRIVE_STOP)
+            // Task notifications are a single overwritable slot, not a queue -- if driver_function
+            // sends STOP immediately followed by a new direction (e.g. backing off a collision),
+            // only the latest value survives here and an exact IMU_DRIVE_STOP match would miss it,
+            // silently swallowing the direction change and continuing the original drive. Every
+            // caller only ever notifies this task to end the current drive segment, so any
+            // notification here should end it.
+            if (xTaskNotifyWait(0x00, ULONG_MAX, NULL, 0) == pdTRUE)
                 break;
 
             TickType_t now_tick = xTaskGetTickCount();

@@ -10,6 +10,7 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "shared_resources.h"
 
 #define PWM_PERIOD_TICKS 50
 
@@ -18,6 +19,7 @@
 #define MOTOR_TURN_DUTY 0.5f
 #define MOTOR_TURN_LOOP_MS 20
 #define MOTOR_TURN_TIMEOUT_MS 10000
+#define MOTOR_TURN_RECAL_SAMPLES 20
 
 // Asssign pin outs for each motor
 /*
@@ -43,12 +45,17 @@ static volatile panel_limit_state_t s_state[2] = {PANEL_OK, PANEL_OK};
 
 panel_limit_state_t panel_get_limit_state(uint8_t panel_id)
 {
-    return s_state[panel_id];
+    xSemaphoreTake(encoder_mutex, portMAX_DELAY);
+    panel_limit_state_t state = s_state[panel_id];
+    xSemaphoreGive(encoder_mutex);
+    return state;
 }
 
 void panel_set_limit_state(uint8_t panel_id, panel_limit_state_t state)
 {
+    xSemaphoreTake(encoder_mutex, portMAX_DELAY);
     s_state[panel_id] = state;
+    xSemaphoreGive(encoder_mutex);
 }
 
 void motor_init(void)
@@ -107,12 +114,11 @@ void motor_init(void)
 // Set duty cycle to 0 for the motor to stop it
 void stop_motor(uint8_t motor_id)
 {
-
     mcpwm_comparator_set_compare_value(motors[motor_id].comparator, 50);
+
     vTaskDelay(pdMS_TO_TICKS(100)); // small delay before saving position to flash in case motor kept moving forward for some time
     if (motor_id <= 1)
         save_position_to_flash(motor_id);
-    ESP_LOGI(TAG, "motor #%d stopping", motor_id);
 }
 
 // makes motor go forward at duty_cycle%
@@ -120,15 +126,21 @@ void motor_go_forward(uint8_t motor_id, float duty_cycle)
 {
     const motor_pins_t *pins = &motors[motor_id].pins;
 
-    if (motor_id > 1 || s_state[motor_id] != PANEL_AT_UPPER_LIMIT)
+    xSemaphoreTake(encoder_mutex, portMAX_DELAY);
+    bool blocked = (motor_id <= 1 && s_state[motor_id] == PANEL_AT_UPPER_LIMIT);
+    if (!blocked)
     {
         if (motor_id <= 1)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to forward
         gpio_set_level(pins->dir_gpio, 0);
-        duty_cycle = 1 - duty_cycle;
+        float compare_duty = 1 - duty_cycle;
+        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * compare_duty);
+    }
+    xSemaphoreGive(encoder_mutex);
 
-        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
+    if (!blocked)
+    {
         ESP_LOGI(TAG, "Moving the motor #%d forward", motor_id);
     }
     else
@@ -143,15 +155,21 @@ void motor_go_backward(uint8_t motor_id, float duty_cycle)
 {
     const motor_pins_t *pins = &motors[motor_id].pins;
 
-    if (motor_id > 1 || s_state[motor_id] != PANEL_AT_LOWER_LIMIT)
+    xSemaphoreTake(encoder_mutex, portMAX_DELAY);
+    bool blocked = (motor_id <= 1 && s_state[motor_id] == PANEL_AT_LOWER_LIMIT);
+    if (!blocked)
     {
         if (motor_id <= 1)
             s_state[motor_id] = PANEL_OK;
         // set the motors direction to reverse
         gpio_set_level(pins->dir_gpio, 1);
-        duty_cycle = 1 - duty_cycle;
+        float compare_duty = 1 - duty_cycle;
+        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * compare_duty);
+    }
+    xSemaphoreGive(encoder_mutex);
 
-        mcpwm_comparator_set_compare_value(motors[motor_id].comparator, PWM_PERIOD_TICKS * duty_cycle);
+    if (!blocked)
+    {
         ESP_LOGI(TAG, "Moving the motor #%d backward", motor_id);
     }
     else
@@ -171,6 +189,11 @@ void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees)
     if (target_deg > 360.0f)
         target_deg = 360.0f;
 
+    // Re-zero the gyro bias here, right before commanding the motors -- the
+    // chassis is still stationary, and a fresh sample corrects for bias
+    // drift that's accumulated since init (or the last turn).
+    solaris_icm20948_recalibrate_gyro(imu, MOTOR_TURN_RECAL_SAMPLES);
+
     if (turn_right)
     { // both motors backward -> turn right on this chassis
         motor_go_backward(MOTOR_LEFT_ID, MOTOR_TURN_DUTY);
@@ -186,6 +209,7 @@ void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees)
     TickType_t last_tick = xTaskGetTickCount();
     TickType_t start_tick = last_tick;
     solaris_icm20948_result_t sample;
+    int read_ok = 0, read_fail = 0;
 
     while (turned_deg < target_deg)
     {
@@ -199,11 +223,17 @@ void motor_turn_degrees(solaris_icm20948_handle_t imu, float degrees)
         {
             float gyro_dps = (float)sample.gyro_z / IMU_GYRO_SENS_LSB_PER_DPS;
             turned_deg += fabsf(gyro_dps) * dt_s;
+            read_ok++;
+        }
+        else
+        {
+            read_fail++;
         }
 
         if ((now_tick - start_tick) * portTICK_PERIOD_MS > MOTOR_TURN_TIMEOUT_MS)
         {
-            ESP_LOGW(TAG, "motor_turn_degrees timed out at %.1f/%.1f deg", turned_deg, target_deg);
+            ESP_LOGW(TAG, "motor_turn_degrees timed out at %.1f/%.1f deg (imu reads: %d ok, %d failed)",
+                     turned_deg, target_deg, read_ok, read_fail);
             break;
         }
     }
@@ -218,17 +248,13 @@ void test_motor(void *pvParameters)
     int pulse_count;
     while (1)
     {
-
-        stop_motor(MOTOR_LEFT_ID);
-        stop_motor(MOTOR_RIGHT_ID);
-        vTaskDelay(pdMS_TO_TICKS(3000));
-        motor_turn_degrees(handle, 45);
-        vTaskDelay(pdMS_TO_TICKS(-45));
-        motor_turn_degrees(handle, 45);
-        vTaskDelay(pdMS_TO_TICKS(3000));
-        motor_turn_degrees(handle, 135);
-        vTaskDelay(pdMS_TO_TICKS(3000));
-        motor_turn_degrees(handle, -135);
-        vTaskDelay(pdTICKS_TO_MS(3000));
+        stop_motor(MOTOR_TILT_ID);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        motor_go_forward(MOTOR_TILT_ID, .15);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        stop_motor(MOTOR_TILT_ID);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        motor_go_backward(MOTOR_TILT_ID, .15);
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }

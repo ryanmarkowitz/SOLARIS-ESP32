@@ -20,6 +20,10 @@ static const char *TAG = "SOLARIS_IMU";
 #define ICM20948_INT_ENABLE 0x10
 #define ICM20948_ACCEL_XOUT_H 0x2D
 
+// Gyro zero-rate calibration, taken once at init while the chassis is stationary.
+#define GYRO_CALIBRATION_SAMPLES 100
+#define GYRO_CALIBRATION_SAMPLE_MS 10
+
 // --- AK09916 Magnetometer Registers ---
 #define AK09916_I2C_ADDR 0x0C
 #define AK09916_WIA2 0x01
@@ -35,6 +39,9 @@ struct solaris_icm_ctx_t
 {
     solaris_icm20948_config_t cfg;
     bool i2c_installed_by_us;
+    float gyro_bias_x;
+    float gyro_bias_y;
+    float gyro_bias_z;
 };
 
 // ---------------------------------------------------------------------------
@@ -118,7 +125,48 @@ esp_err_t solaris_icm20948_init(const solaris_icm20948_config_t *config, solaris
 
     ESP_LOGI(TAG, "9-DoF Initialised successfully.");
     *handle = ctx;
+
+    // Zero-rate gyro calibration. Must run here, before any task can command
+    // a motor, since it assumes the chassis is stationary. The ICM-20948
+    // gyro_z has been measured carrying a persistent ~18 dps raw offset with
+    // no on-chip trim -- left uncorrected, that offset alone integrates into
+    // a false ~18 deg/s of "turning" in motor_turn_degrees/imu_drive_task.
+    solaris_icm20948_recalibrate_gyro(ctx, GYRO_CALIBRATION_SAMPLES);
+    ESP_LOGI(TAG, "Gyro bias calibrated: x=%.1f y=%.1f z=%.1f",
+             ctx->gyro_bias_x, ctx->gyro_bias_y, ctx->gyro_bias_z);
+
     return ESP_OK;
+}
+// ---------------------------------------------------------------------------
+
+void solaris_icm20948_recalibrate_gyro(solaris_icm20948_handle_t handle, int num_samples)
+{
+    if (!handle || num_samples <= 0)
+        return;
+
+    // solaris_icm20948_read() already subtracts the existing bias, so what
+    // we average here is the residual drift since the last calibration --
+    // add it to the running bias rather than replacing it.
+    float sum_x = 0.0f, sum_y = 0.0f, sum_z = 0.0f;
+    int good_samples = 0;
+    solaris_icm20948_result_t sample;
+    for (int i = 0; i < num_samples; i++)
+    {
+        if (solaris_icm20948_read(handle, &sample) == ESP_OK)
+        {
+            sum_x += sample.gyro_x;
+            sum_y += sample.gyro_y;
+            sum_z += sample.gyro_z;
+            good_samples++;
+        }
+        vTaskDelay(pdMS_TO_TICKS(GYRO_CALIBRATION_SAMPLE_MS));
+    }
+    if (good_samples > 0)
+    {
+        handle->gyro_bias_x += sum_x / good_samples;
+        handle->gyro_bias_y += sum_y / good_samples;
+        handle->gyro_bias_z += sum_z / good_samples;
+    }
 }
 // ---------------------------------------------------------------------------
 
@@ -148,9 +196,12 @@ esp_err_t solaris_icm20948_read(solaris_icm20948_handle_t handle, solaris_icm209
     result->accel_y = (int16_t)((imu_raw[2] << 8) | imu_raw[3]);
     result->accel_z = (int16_t)((imu_raw[4] << 8) | imu_raw[5]);
 
-    result->gyro_x = (int16_t)((imu_raw[8] << 8) | imu_raw[9]);
-    result->gyro_y = (int16_t)((imu_raw[10] << 8) | imu_raw[11]);
-    result->gyro_z = (int16_t)((imu_raw[12] << 8) | imu_raw[13]);
+    int16_t raw_gyro_x = (int16_t)((imu_raw[6] << 8) | imu_raw[7]);
+    int16_t raw_gyro_y = (int16_t)((imu_raw[8] << 8) | imu_raw[9]);
+    int16_t raw_gyro_z = (int16_t)((imu_raw[10] << 8) | imu_raw[11]);
+    result->gyro_x = (int16_t)(raw_gyro_x - handle->gyro_bias_x);
+    result->gyro_y = (int16_t)(raw_gyro_y - handle->gyro_bias_y);
+    result->gyro_z = (int16_t)(raw_gyro_z - handle->gyro_bias_z);
 
     // 2. Read AK09916 (Little-Endian)
     // We must read 8 bytes starting at HXL. The 8th byte is the ST2 register.

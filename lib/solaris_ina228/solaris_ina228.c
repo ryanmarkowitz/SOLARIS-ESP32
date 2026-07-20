@@ -89,10 +89,6 @@ static uint8_t load_soc()
         nvs_close(nvs_handle);
         return 0;
     }
-    else
-    {
-        ESP_LOGI(TAG, "SOC loaded from flash: %d", (int)soc);
-    }
     nvs_close(nvs_handle);
     return soc;
 }
@@ -175,6 +171,18 @@ static int32_t prv_sign_extend_20bit(uint32_t val)
     return (int32_t)val;
 }
 
+// CHARGE is a 40-bit two's-complement register (current, and therefore
+// accumulated charge, is bidirectional). prv_read_reg40 only populates the
+// low 40 bits of the uint64_t, so a plain (int64_t) cast does NOT sign-extend
+// bit 39 -- a negative charge reads back as a huge positive number (~2^40),
+// which then blows up the SOC delta calculation.
+static int64_t prv_sign_extend_40bit(uint64_t val)
+{
+    if (val & 0x8000000000ULL)
+        return (int64_t)(val | 0xFFFFFF0000000000ULL);
+    return (int64_t)val;
+}
+
 static uint8_t prv_calculate_soc(const struct solaris_ina228_ctx_t *ctx,
                                  uint8_t cur_soc, float delta_c)
 {
@@ -196,7 +204,12 @@ static uint8_t prv_calculate_soc(const struct solaris_ina228_ctx_t *ctx,
 // call, persists the result back to flash, and returns it.
 static uint8_t prv_update_soc(struct solaris_ina228_ctx_t *ctx, float charge_c)
 {
-    float delta_c = ctx->soc_initialized ? (charge_c - ctx->last_charge_c) : charge_c;
+    // The CHARGE register only resets on IC power-loss or an explicit RSTACC write,
+    // so on the first read after boot it holds leftover charge from all prior
+    // runtime, not a delta since "last update". Treating that as a delta here
+    // used to slam SOC to 0% the instant the firmware booted -- just establish
+    // the baseline on the first call instead.
+    float delta_c = ctx->soc_initialized ? (charge_c - ctx->last_charge_c) : 0.0f;
     ctx->last_charge_c = charge_c;
     ctx->soc_initialized = true;
 
@@ -296,7 +309,7 @@ esp_err_t solaris_ina228_read_soc(solaris_ina228_handle_t handle,
         return err;
 
     // Charge LSB = CURRENT_LSB coulombs
-    float charge_c = (float)(int64_t)raw_charge * handle->cfg.current_lsb;
+    float charge_c = (float)prv_sign_extend_40bit(raw_charge) * handle->cfg.current_lsb;
 
     *soc_percent = prv_update_soc(handle, charge_c);
     return ESP_OK;
@@ -348,7 +361,7 @@ esp_err_t solaris_ina228_read(solaris_ina228_handle_t handle,
     err = prv_read_reg40(handle, INA228_REG_CHARGE, &raw_charge);
     if (err != ESP_OK)
         return err;
-    result->charge_c = (float)(int64_t)raw_charge * handle->cfg.current_lsb;
+    result->charge_c = (float)prv_sign_extend_40bit(raw_charge) * handle->cfg.current_lsb;
     result->charge_mah = result->charge_c / COULOMBS_PER_MAH;
 
     // TEMPERATURE
@@ -444,17 +457,20 @@ void solaris_ina228_make_move_decision(void *pvParameters)
     while (1)
     {
         xTaskNotifyWait(0x00, ULONG_MAX, NULL, portMAX_DELAY);
+        ESP_LOGI(TAG, "move_decision: woken up, evaluating");
         solaris_weather_get(&weather);
         now = (uint32_t)time(NULL);
         // If its an hour after sunruse or before, don't bother moving
         if (now - 3600 < weather.sunrise)
         {
-            ;
+            ESP_LOGI(TAG, "move_decision: skipping, within an hour of/before sunrise (now=%u sunrise=%u)",
+                     (unsigned)now, (unsigned)weather.sunrise);
         }
         // if its an hour before sunset or after, dont bother moving
         else if (now + 3600 > weather.sunset)
         {
-            ;
+            ESP_LOGI(TAG, "move_decision: skipping, within an hour of/after sunset (now=%u sunset=%u)",
+                     (unsigned)now, (unsigned)weather.sunset);
         }
         else
         {
@@ -465,26 +481,45 @@ void solaris_ina228_make_move_decision(void *pvParameters)
             // If the last 30 seconds has seen a 5% drop it is likely shade / clouds over the panel.
             // Determine if cloud percentage is low and then move the robot if that's the case
             solaris_ina228_read(handle, &result);
+            ESP_LOGI(TAG, "move_decision: current=%.4fA median_30s=%.3fW median_3m=%.3fW",
+                     result.current_a, median_last_30s, median_last_3m);
             if (result.current_a != 0)
             { // If current is at 0.0mA then the battery is likely fully charged. Don't bother moving
 
-                if (median_last_30s * 1.05 < median_last_3m)
+                // median_last_3m can be negative (still net charging, just less than before)
+                // or positive (net discharging) -- the 5% comparison flips direction depending
+                // on which side of zero the baseline sits on.
+                bool drop_detected = (median_last_3m >= 0)
+                                         ? (median_last_30s * 1.05 < median_last_3m)
+                                         : (median_last_30s * 1.05 > median_last_3m);
+                if (drop_detected)
                 {
 
                     const solaris_forecast_entry_t *forecast_now = solaris_weather_get_forecast_at(&weather, now);
                     uint8_t cloud_cover_pct = forecast_now ? forecast_now->cloud_cover_pct : 0;
+                    ESP_LOGI(TAG, "move_decision: %.3fW->%.3fW drop detected, cloud_cover=%u%% (threshold=%d)",
+                             median_last_3m, median_last_30s, cloud_cover_pct, CLOUD_COVERAGE_PERCENTAGE_DECISION);
                     // If cloud coverage percentage is high either don't move at all, or add extra logic on if you should move
                     if (cloud_cover_pct > CLOUD_COVERAGE_PERCENTAGE_DECISION)
                     {
-                        ;
+                        ESP_LOGI(TAG, "move_decision: skipping, cloud cover too high to be worth moving for");
                     }
                     else
                     {
+                        ESP_LOGI(TAG, "move_decision: notifying driver_function to move");
                         // Send notification to move
                         memcpy(&bits, &median_last_3m, sizeof(bits));
                         xTaskNotify(xDriverFunction, bits, eSetValueWithOverwrite);
                     }
                 }
+                else
+                {
+                    ESP_LOGI(TAG, "move_decision: skipping, no significant power drop (30s median within 5%% of 3m median)");
+                }
+            }
+            else
+            {
+                ESP_LOGI(TAG, "move_decision: skipping, current reads 0A (battery likely full)");
             }
         }
     }
@@ -495,6 +530,7 @@ void solaris_ina228_1s_read(void *pvParmaters)
     solaris_ina228_handle_t handle = (solaris_ina228_handle_t)pvParmaters;
     solaris_ina228_result_t result;
     int counter = 0;
+    bool first_decision = true;
     TickType_t last = xTaskGetTickCount();
     while (1)
     {
@@ -509,7 +545,7 @@ void solaris_ina228_1s_read(void *pvParmaters)
             solaris_power_buffer[solaris_power_buffer_idx] = -result.power_w;
             solaris_power_buffer_idx = (solaris_power_buffer_idx + 1) % 180;
             solaris_power_buffer_with_moves_included[solaris_power_buffer_with_moves_included_idx] = -result.power_w;
-            solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 180;
+            solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 60;
 
             // give back mutexes
             xSemaphoreGive(solaris_energy_monitor_resource);
@@ -517,10 +553,25 @@ void solaris_ina228_1s_read(void *pvParmaters)
             xSemaphoreGive(solaris_energy_monitor_resource_with_moves);
 
             counter++;
-            if (counter == SOLARIS_RING_BUFFER_SIZE)
+            ESP_LOGI(TAG, "1s_read: V=%.3fV I=%.4fA P=%.4fW first_decision=%s counter=%d/%d",
+                     result.voltage_v, result.current_a, result.power_w,
+                     first_decision ? "true" : "false", counter,
+                     first_decision ? SOLARIS_RING_BUFFER_SIZE : 30);
+            if (first_decision)
+            {
+                if (counter == SOLARIS_RING_BUFFER_SIZE)
+                {
+                    counter = 0;
+                    first_decision = false;
+                    if (xMoveDecision != NULL)
+                        xTaskNotifyGive(xMoveDecision);
+                }
+            }
+            else if (counter == 30)
             {
                 // after 3 minutes of information is filled, notify move decision task to fire
                 counter = 0;
+                ESP_LOGI(TAG, "1s_read: waking move_decision task");
                 // xMoveDecision is only set when its task is created in main.c, which is
                 // currently commented out -- xTaskNotifyGive configASSERTs on a NULL handle.
                 if (xMoveDecision != NULL)
@@ -532,8 +583,8 @@ void solaris_ina228_1s_read(void *pvParmaters)
             xSemaphoreTake(solaris_energy_monitor_resource_with_moves, portMAX_DELAY);
 
             solaris_ina228_read(handle, &result);
-            solaris_power_buffer_with_moves_included[solaris_power_buffer_with_moves_included_idx] = result.power_w;
-            solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 180;
+            solaris_power_buffer_with_moves_included[solaris_power_buffer_with_moves_included_idx] = -result.power_w;
+            solaris_power_buffer_with_moves_included_idx = (solaris_power_buffer_with_moves_included_idx + 1) % 60;
 
             xSemaphoreGive(solaris_energy_monitor_resource_with_moves);
         }
